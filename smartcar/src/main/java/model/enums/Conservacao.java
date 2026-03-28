@@ -4,5 +4,5 @@ public enum Conservacao {
     NOVO,
     BOM,
     REGULAR,
-        RUIM
+    RUIM
 }
