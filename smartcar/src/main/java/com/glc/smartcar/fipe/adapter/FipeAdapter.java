@@ -23,7 +23,7 @@ public class FipeAdapter implements FipePort {
     }
 
     @Override
-    public FipeModelosResponse buscarModelos(String brandId) {
+    public List<FipeModelosResponse> buscarModelos(String brandId) {
         return fipeClient.buscarModelos(brandId);
     }
 

@@ -1,4 +1,6 @@
 package com.glc.smartcar.fipe.dto;
 
-public record FipeMarcaDTO(String nome, String codigo) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record FipeMarcaDTO(@JsonProperty("name")String nome, @JsonProperty("code") String codigo) {
 }

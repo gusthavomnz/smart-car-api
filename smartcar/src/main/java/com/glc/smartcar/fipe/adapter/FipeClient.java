@@ -17,7 +17,7 @@ public interface FipeClient {
     // Esse metodo irá retornar todas marcas de carros disponiveis (RF-04)
 
     @GetMapping("/cars/brands/{brandId}/models")
-    FipeModelosResponse buscarModelos(@PathVariable("brandId") String brandId);
+    List<FipeModelosResponse> buscarModelos(@PathVariable("brandId") String brandId);
     // Esse metodo consulta todos modelos de carros associados a uma marca. (RF-05)
 
     @GetMapping("/cars/brands/{brandId}/models/{modelId}/years")

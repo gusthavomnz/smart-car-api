@@ -10,7 +10,6 @@ public class AvaliacaoRequestDTO {
 
     private Long usuarioId;
 
-    // Usado para pesquisar na Fipe:
     private String brandId;
     private String modelId;
     private String yearId;

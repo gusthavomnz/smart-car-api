@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface FipePort {
     List<FipeMarcaDTO> buscarMarcas();
-    FipeModelosResponse buscarModelos(String brandId);
+    List<FipeModelosResponse> buscarModelos(String brandId);
     List<FipeMarcaDTO> buscarAnos(String brandId, String modelId);
     FipeVeiculoDTO obterPreco(String brandId, String modelId, String yearId);
 }
