@@ -1,10 +1,11 @@
-package model;
+package com.glc.smartcar.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Entity
@@ -27,5 +28,5 @@ public class Usuario {
     private String senha;
 
     @Column(name = "criado_a")
-    private DateTimeFormatter criado_a;
+    private LocalDateTime criado_a;
 }

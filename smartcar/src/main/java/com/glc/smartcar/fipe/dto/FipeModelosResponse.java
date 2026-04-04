@@ -1,6 +1,4 @@
-package response;
-
-import request.FipeInfoRequest;
+package com.glc.smartcar.fipe.dto;
 
 import java.util.List;
 

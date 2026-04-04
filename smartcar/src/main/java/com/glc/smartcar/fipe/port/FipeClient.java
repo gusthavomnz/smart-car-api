@@ -1,11 +1,11 @@
-package client;
+package com.glc.smartcar.fipe.port;
 
+import com.glc.smartcar.fipe.dto.FipeInfoRequest;
+import com.glc.smartcar.fipe.dto.FipeInfoResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import request.FipeInfoRequest;
-import response.FipeInfoResponse;
-import response.FipeModelosResponse;
+import com.glc.smartcar.fipe.dto.FipeModelosResponse;
 
 import java.util.List;
 

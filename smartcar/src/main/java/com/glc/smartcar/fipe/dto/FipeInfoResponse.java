@@ -1,4 +1,4 @@
-package response;
+package com.glc.smartcar.fipe.dto;
 
 public record FipeInfoResponse(
         String Valor,

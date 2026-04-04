@@ -1,4 +1,4 @@
-package model;
+package com.glc.smartcar.fipe;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
