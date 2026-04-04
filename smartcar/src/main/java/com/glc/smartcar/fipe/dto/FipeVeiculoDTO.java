@@ -1,6 +1,6 @@
 package com.glc.smartcar.fipe.dto;
 
-public record FipeInfoResponse(
+public record FipeVeiculoDTO(
         String Valor,
         String Marca,
         String Modelo,
