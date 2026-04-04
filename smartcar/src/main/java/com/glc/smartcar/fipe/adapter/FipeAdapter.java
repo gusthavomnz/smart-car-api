@@ -1,7 +1,6 @@
 package com.glc.smartcar.fipe.adapter;
 
-import com.glc.smartcar.fipe.dto.FipeMarcaDTO;
-import com.glc.smartcar.fipe.dto.FipeModelosResponse;
+import com.glc.smartcar.fipe.dto.FipeNameAndCode;
 import com.glc.smartcar.fipe.dto.FipeVeiculoDTO;
 import com.glc.smartcar.fipe.port.FipePort;
 import org.springframework.stereotype.Component;
@@ -18,17 +17,17 @@ public class FipeAdapter implements FipePort {
     }
 
     @Override
-    public List<FipeMarcaDTO> buscarMarcas() {
+    public List<FipeNameAndCode> buscarMarcas() {
         return fipeClient.buscarMarcas();
     }
 
     @Override
-    public List<FipeModelosResponse> buscarModelos(String brandId) {
+    public List<FipeNameAndCode> buscarModelos(String brandId) {
         return fipeClient.buscarModelos(brandId);
     }
 
     @Override
-    public List<FipeMarcaDTO> buscarAnos(String brandId, String modelId) {
+    public List<FipeNameAndCode> buscarAnos(String brandId, String modelId) {
         return fipeClient.buscarAnos(brandId, modelId);
     }
 
