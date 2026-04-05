@@ -1,14 +1,13 @@
-package model;
+package com.glc.smartcar.avaliacoes;
 
+import com.glc.smartcar.avaliacoes.enums.Conservacao;
+import com.glc.smartcar.avaliacoes.enums.HistoricoAtivo;
+import com.glc.smartcar.avaliacoes.enums.StatusResultado;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-
-import model.enums.Conservacao;
-import model.enums.HistoricoAtivo;
-import model.enums.StatusResultado;
 
 @Entity
 @Data

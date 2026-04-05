@@ -1,4 +1,4 @@
-package model.enums;
+package com.glc.smartcar.avaliacoes.enums;
 
 public enum StatusResultado {
     OTIMO_NEGOCIO,
