@@ -20,7 +20,7 @@ CREATE TABLE fipe (
 CREATE TABLE avaliacoes (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     usuario_id BIGINT NOT NULL,
-    fipe_id BIGINT NOT NULL,
+    fipe_id VARCHAR(50) NOT NULL,
     preco_desejado DECIMAL(10,2),
     preco_fipe DECIMAL(10,2),
     status_resultado VARCHAR(50),
@@ -31,9 +31,5 @@ CREATE TABLE avaliacoes (
 
     CONSTRAINT fk_avaliacoes_usuario
         FOREIGN KEY (usuario_id) REFERENCES usuario(id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_avaliacoes_fipe
-        FOREIGN KEY (fipe_id) REFERENCES fipe(id)
         ON DELETE CASCADE
 );

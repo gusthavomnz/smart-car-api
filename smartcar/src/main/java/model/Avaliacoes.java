@@ -24,7 +24,7 @@ public class Avaliacoes {
     private Long usuarioId;
 
     @Column(name = "fipe_id", nullable = false)
-    private long fipeId;
+    private String fipeId;
 
     @Column(name = "preco_desejado", nullable = false)
     private Double precoDesejado;
