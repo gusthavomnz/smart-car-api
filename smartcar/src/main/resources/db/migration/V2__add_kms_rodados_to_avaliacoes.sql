@@ -1,0 +1,2 @@
+ALTER TABLE avaliacoes
+ADD COLUMN kms_rodados DOUBLE NOT NULL DEFAULT 0;

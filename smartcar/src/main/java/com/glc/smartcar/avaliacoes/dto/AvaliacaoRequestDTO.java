@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public class AvaliacaoRequestDTO {
 
     private Long usuarioId;
+    private double kmsRodados;
 
     private String brandId;
     private String modelId;

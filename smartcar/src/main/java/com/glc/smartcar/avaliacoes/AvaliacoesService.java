@@ -6,55 +6,64 @@ import com.glc.smartcar.avaliacoes.enums.HistoricoAtivo;
 import com.glc.smartcar.avaliacoes.enums.StatusResultado;
 import com.glc.smartcar.fipe.dto.FipeVeiculoDTO;
 import com.glc.smartcar.fipe.port.FipePort;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 
 @Service
+
 public class AvaliacoesService {
 
     private final FipePort fipePort;
     private final AvaliacoesRepository avaliacoesRepository;
+
+    @Autowired
+    private ClassificacaoService classificacaoService;
 
     public AvaliacoesService(FipePort fipePort, AvaliacoesRepository avaliacoesRepository) {
         this.fipePort = fipePort;
         this.avaliacoesRepository = avaliacoesRepository;
     }
 
+    public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO dto) {
 
-
-    public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO avaliacaoRequestDTO) {
         FipeVeiculoDTO fipeVeiculoDTO = fipePort.obterPreco(
-                avaliacaoRequestDTO.getBrandId(),
-                avaliacaoRequestDTO.getModelId(),
-                avaliacaoRequestDTO.getYearId()
+                dto.getBrandId(), dto.getModelId(), dto.getYearId()
         );
 
-        // converte o valor FIPE de String para double
-        double precoFipe = Double.parseDouble(
-                fipeVeiculoDTO.Valor()
-                        .replace("R$ ", "")
-                        .replace(".", "")
-                        .replace(",", ".")
+        double precoFipe = classificacaoService.parseFipe(fipeVeiculoDTO.Valor());
+        int converterAno = classificacaoService.parseYearId(dto.getYearId());
+
+        double precoJusto = classificacaoService.calcularPrecoJusto(
+                precoFipe,
+                converterAno,
+                dto.getKmsRodados(),
+                dto.getConservacao()
         );
 
-        // chama uma vez e guarda o resultado
-        StatusResultado status = avaliacaoPreco(avaliacaoRequestDTO.getPrecoDesejado(), precoFipe);
+        StatusResultado status = classificacaoService.classificarNegocio(
+                dto.getPrecoDesejado(), precoJusto
+        );
 
         Avaliacoes novaAvaliacao = new Avaliacoes();
-        novaAvaliacao.setUsuarioId(avaliacaoRequestDTO.getUsuarioId());
+        novaAvaliacao.setUsuarioId(dto.getUsuarioId());
         novaAvaliacao.setFipeId(fipeVeiculoDTO.CodigoFipe());
-        novaAvaliacao.setConservacao(avaliacaoRequestDTO.getConservacao());
+        novaAvaliacao.setConservacao(dto.getConservacao());
         novaAvaliacao.setHistoricoAtivo(HistoricoAtivo.SIM);
-        novaAvaliacao.setNotasPessoais(avaliacaoRequestDTO.getNotasPessoais());
-        novaAvaliacao.setPrecoDesejado(avaliacaoRequestDTO.getPrecoDesejado());
+        novaAvaliacao.setNotasPessoais(dto.getNotasPessoais());
+        novaAvaliacao.setPrecoDesejado(dto.getPrecoDesejado());
         novaAvaliacao.setPrecoFipe(precoFipe);
         novaAvaliacao.setStatusResultado(status);
         novaAvaliacao.setCriado_a(LocalDateTime.now());
+        novaAvaliacao.setKmsRodados(dto.getKmsRodados());
 
         Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
 
+        // Mapeamento direto/Depois refatorar.
         return new AvaliacaoResponseDTO(
                 salvo.getId(),
                 salvo.getUsuarioId(),
@@ -70,17 +79,5 @@ public class AvaliacoesService {
     }
 
 
-    public StatusResultado avaliacaoPreco(double precoDesejado, double precoFipe) {
-        var calculo = ((precoDesejado - precoFipe) / precoFipe) * 100;
 
-        if (calculo <= -5) {
-            return StatusResultado.OTIMO_NEGOCIO;
-        } else if (calculo <= 5) {
-            return StatusResultado.NA_MEDIA;
-        } else if (calculo <= 15) {
-            return StatusResultado.ACIMA_DA_MEDIA;
-        } else {
-            return StatusResultado.DIFICIL_DE_VENDER;
-        }
-    }
 }

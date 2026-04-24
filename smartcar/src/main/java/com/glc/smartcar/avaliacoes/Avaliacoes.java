@@ -28,6 +28,9 @@ public class Avaliacoes {
     @Column(name = "preco_desejado", nullable = false)
     private Double precoDesejado;
 
+    @Column(name = "kms_rodados", nullable = false)
+    private Double kmsRodados;
+
     @Column(name = "preco_fipe", nullable = false)
     private Double precoFipe;
 
