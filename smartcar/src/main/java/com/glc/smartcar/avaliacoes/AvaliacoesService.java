@@ -6,7 +6,9 @@ import com.glc.smartcar.avaliacoes.enums.HistoricoAtivo;
 import com.glc.smartcar.avaliacoes.enums.StatusResultado;
 import com.glc.smartcar.fipe.dto.FipeVeiculoDTO;
 import com.glc.smartcar.fipe.port.FipePort;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -27,6 +29,7 @@ public class AvaliacoesService {
         this.classificacaoService = classificacaoService;
     }
 
+    @Transactional
     public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO dto) {
 
         FipeVeiculoDTO fipeVeiculoDTO = fipePort.obterPreco(
@@ -54,5 +57,13 @@ public class AvaliacoesService {
         return avaliacoesMapper.toDTO(salvo);
     }
 
+    @Transactional
+    public AvaliacaoResponseDTO excluirAvaliacao(Long id) {
+        Avaliacoes a = avaliacoesRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Avaliação não encontrada"));
+
+        a.setHistoricoAtivo(HistoricoAtivo.NAO);
+        return avaliacoesMapper.toDTO(avaliacoesRepository.save(a));
+    }
 
 }

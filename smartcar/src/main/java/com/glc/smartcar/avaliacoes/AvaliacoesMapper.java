@@ -36,10 +36,6 @@ public class AvaliacoesMapper {
 
 
 
-
-
-
-
     public AvaliacaoResponseDTO toDTO(Avaliacoes entity){
         if (entity == null) {
             return null;
