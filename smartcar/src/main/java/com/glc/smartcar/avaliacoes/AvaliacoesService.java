@@ -6,9 +6,6 @@ import com.glc.smartcar.avaliacoes.enums.HistoricoAtivo;
 import com.glc.smartcar.avaliacoes.enums.StatusResultado;
 import com.glc.smartcar.fipe.dto.FipeVeiculoDTO;
 import com.glc.smartcar.fipe.port.FipePort;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,13 +17,14 @@ public class AvaliacoesService {
 
     private final FipePort fipePort;
     private final AvaliacoesRepository avaliacoesRepository;
+    private final AvaliacoesMapper avaliacoesMapper;
+    private final ClassificacaoService classificacaoService;
 
-    @Autowired
-    private ClassificacaoService classificacaoService;
-
-    public AvaliacoesService(FipePort fipePort, AvaliacoesRepository avaliacoesRepository) {
+    public AvaliacoesService(FipePort fipePort, AvaliacoesRepository avaliacoesRepository, AvaliacoesMapper avaliacoesMapper, ClassificacaoService classificacaoService) {
         this.fipePort = fipePort;
         this.avaliacoesRepository = avaliacoesRepository;
+        this.avaliacoesMapper = avaliacoesMapper;
+        this.classificacaoService = classificacaoService;
     }
 
     public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO dto) {
@@ -62,22 +60,8 @@ public class AvaliacoesService {
         novaAvaliacao.setKmsRodados(dto.getKmsRodados());
 
         Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
-
-        // Mapeamento direto/Depois refatorar.
-        return new AvaliacaoResponseDTO(
-                salvo.getId(),
-                salvo.getUsuarioId(),
-                salvo.getFipeId(),
-                salvo.getPrecoDesejado(),
-                salvo.getPrecoFipe(),
-                salvo.getStatusResultado(),
-                salvo.getCriado_a(),
-                salvo.getConservacao(),
-                salvo.getHistoricoAtivo(),
-                salvo.getNotasPessoais()
-        );
+        return avaliacoesMapper.toDTO(salvo);
     }
-
 
 
 }
