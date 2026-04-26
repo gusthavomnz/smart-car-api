@@ -47,19 +47,10 @@ public class AvaliacoesService {
                 dto.getPrecoDesejado(), precoJusto
         );
 
-        Avaliacoes novaAvaliacao = new Avaliacoes();
-        novaAvaliacao.setUsuarioId(dto.getUsuarioId());
-        novaAvaliacao.setFipeId(fipeVeiculoDTO.CodigoFipe());
-        novaAvaliacao.setConservacao(dto.getConservacao());
-        novaAvaliacao.setHistoricoAtivo(HistoricoAtivo.SIM);
-        novaAvaliacao.setNotasPessoais(dto.getNotasPessoais());
-        novaAvaliacao.setPrecoDesejado(dto.getPrecoDesejado());
-        novaAvaliacao.setPrecoFipe(precoFipe);
-        novaAvaliacao.setStatusResultado(status);
-        novaAvaliacao.setCriado_a(LocalDateTime.now());
-        novaAvaliacao.setKmsRodados(dto.getKmsRodados());
+        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto,precoFipe, fipeVeiculoDTO.CodigoFipe(), status);
 
         Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
+
         return avaliacoesMapper.toDTO(salvo);
     }
 

@@ -2,6 +2,7 @@ package com.glc.smartcar.avaliacoes;
 
 import com.glc.smartcar.avaliacoes.dto.AvaliacaoRequestDTO;
 import com.glc.smartcar.avaliacoes.dto.AvaliacaoResponseDTO;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +16,7 @@ public class AvaliacoesController {
     }
 
     @PostMapping
-    public AvaliacaoResponseDTO criarAvaliacao(@RequestBody AvaliacaoRequestDTO avaliacaoRequestDTO){
+    public AvaliacaoResponseDTO criarAvaliacao(@Valid @RequestBody AvaliacaoRequestDTO avaliacaoRequestDTO){
         return avaliacoesService.criarAvaliacao(avaliacaoRequestDTO);
     }
 }
