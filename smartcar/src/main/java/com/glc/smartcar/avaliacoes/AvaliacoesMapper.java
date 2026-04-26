@@ -8,6 +8,7 @@ import com.glc.smartcar.avaliacoes.enums.StatusResultado;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public class AvaliacoesMapper {
@@ -51,5 +52,11 @@ public class AvaliacoesMapper {
               entity.getConservacao(),
               entity.getHistoricoAtivo(),
               entity.getNotasPessoais());
+    }
+
+    public List<AvaliacaoResponseDTO> toDTOList(List<Avaliacoes> entities) {
+        return entities.stream()
+                .map(this::toDTO)
+                .toList();
     }
 }

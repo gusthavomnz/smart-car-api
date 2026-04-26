@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/sc")
 public class AvaliacoesController {
@@ -26,4 +28,12 @@ public class AvaliacoesController {
         var response = avaliacoesService.excluirAvaliacao(id);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<AvaliacaoResponseDTO>> listarAvaliacoes(@PathVariable Long usuarioId) {
+        // Quando implementar SpringSecurity, não receber usuarioID no parametro e obter usuarioID via TokenJWT
+        List<AvaliacaoResponseDTO> lista = avaliacoesService.listarAvaliacoesPorUsuario(usuarioId);
+        return ResponseEntity.ok(lista);
+    }
+
 }
