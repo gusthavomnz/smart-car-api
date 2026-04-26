@@ -1,14 +1,11 @@
 package com.glc.smartcar.avaliacoes;
 
-import com.glc.smartcar.avaliacoes.dto.AvaliacaoRequestDTO;
 import com.glc.smartcar.avaliacoes.enums.Conservacao;
 import com.glc.smartcar.avaliacoes.enums.StatusResultado;
-import com.glc.smartcar.fipe.dto.FipeVeiculoDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-import static org.bouncycastle.crypto.generators.Poly1305KeyGenerator.clamp;
 @Service
 public class ClassificacaoService {
 
@@ -81,6 +78,7 @@ carro impecável → até +20%
         double fator = Math.exp(-COEF_DECAIMENTO_KM * diferenca);
         return clamp(fator, FATOR_KM_MIN, FATOR_KM_MAX);
     }
+
     double calcularFatorConservacao(Conservacao conservacao) {
         double valorConservacao = conservacao.getValor();
         double fator = 1.0 + PESO_CONSERVACAO * (valorConservacao - CONS_NEUTRO);
@@ -92,9 +90,9 @@ carro impecável → até +20%
     }
 
     double calcularPrecoJusto(double precoFipe, int anoFabricacao, double kmAtual, Conservacao conservacao) {
-        int    idade    = calcularIdade(anoFabricacao);
-        double kmEsper  = calcularKmEsperado(idade);
-        double fatorKm  = calcularFatorKm(kmAtual, kmEsper);
+        int idade = calcularIdade(anoFabricacao);
+        double kmEsper = calcularKmEsperado(idade);
+        double fatorKm = calcularFatorKm(kmAtual, kmEsper);
         double fatorCons = calcularFatorConservacao(conservacao);
         return precoFipe * fatorKm * fatorCons;
     }
