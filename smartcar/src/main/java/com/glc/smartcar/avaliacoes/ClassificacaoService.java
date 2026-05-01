@@ -60,8 +60,8 @@ carro impecável → até +20%
     }
 
     /* Idade do veículo em anos completos. */
-    int calcularIdade(int anoFabricacao) {
-        return Math.max(0, LocalDateTime.now().getYear() - anoFabricacao);
+    int calcularIdade(int anoFabricacao, int anoAtual) {
+        return Math.max(0, anoAtual - anoFabricacao);
     }
 
     /* KM esperado para a idade do veículo. */
@@ -90,7 +90,7 @@ carro impecável → até +20%
     }
 
     double calcularPrecoJusto(double precoFipe, int anoFabricacao, double kmAtual, Conservacao conservacao) {
-        int idade = calcularIdade(anoFabricacao);
+        int idade = calcularIdade(anoFabricacao, LocalDateTime.now().getYear());
         double kmEsper = calcularKmEsperado(idade);
         double fatorKm = calcularFatorKm(kmAtual, kmEsper);
         double fatorCons = calcularFatorConservacao(conservacao);
