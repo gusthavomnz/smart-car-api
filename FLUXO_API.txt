@@ -1,0 +1,179 @@
+====================================================
+           SMARTCAR — FLUXO DO SISTEMA
+====================================================
+
+BASE URL: http://localhost:8080
+
+
+----------------------------------------------------
+1. CADASTRO DE USUÁRIO — NÃO IMPLEMENTADO
+----------------------------------------------------
+
+----------------------------------------------------
+2. LOGIN — NÃO IMPLEMENTADO
+----------------------------------------------------
+
+
+----------------------------------------------------
+3. BUSCAR MARCAS
+----------------------------------------------------
+GET http://localhost:8080/fipe
+
+Response (use o "code" da marca que quiser no próximo passo):
+[
+  {
+    "name": "BMW",
+    "code": "7"
+  }
+]
+
+
+----------------------------------------------------
+4. BUSCAR MODELOS DA MARCA
+----------------------------------------------------
+GET http://localhost:8080/fipe/marcas/{code_da_marca}/modelos
+
+Use o "code" retornado no passo 3.
+Exemplo com BMW (code = "7"):
+GET http://localhost:8080/fipe/marcas/7/modelos
+
+Response (use o "code" do modelo que quiser no próximo passo):
+[
+  {
+    "name": "330e M Sport 2.0 Turbo Aut. (Híbrido)",
+    "code": "9956"
+  }
+]
+
+
+----------------------------------------------------
+5. BUSCAR ANOS DO MODELO
+----------------------------------------------------
+GET http://localhost:8080/fipe/marcas/{code_da_marca}/modelos/{code_do_modelo}/anos
+
+Use os "code" retornados nos passos 3 e 4.
+Exemplo:
+GET http://localhost:8080/fipe/marcas/7/modelos/9956/anos
+
+Response (use o "code" do ano que quiser no próximo passo):
+[
+  {
+    "name": "2026 Híbrido",
+    "code": "2026-6"
+  }
+]
+
+
+----------------------------------------------------
+6. BUSCAR DETALHES DO VEÍCULO (preço FIPE)
+----------------------------------------------------
+GET http://localhost:8080/fipe/marcas/{code_da_marca}/modelos/{code_do_modelo}/anos/{code_do_ano}
+
+Use os "code" retornados nos passos 3, 4 e 5.
+Exemplo:
+GET http://localhost:8080/fipe/marcas/7/modelos/9956/anos/2024-6
+
+Response:
+{
+  "price": "R$ 320.333,00",
+  "brand": "BMW",
+  "model": "330e M Sport 2.0 Turbo Aut. (Híbrido)",
+  "modelYear": 2024,
+  "fuel": "Híbrido",
+  "codeFipe": "009266-5",
+  "referenceMonth": "maio de 2026"
+}
+
+OBS: guarde o brandId, modelId e yearId — você vai usar na avaliação.
+
+
+----------------------------------------------------
+7. CRIAR AVALIAÇÃO
+----------------------------------------------------
+POST http://localhost:8080/sc
+Content-Type: application/json
+
+Request Body:
+{
+  "usuarioId": 1,
+  "kmsRodados": 15000,
+  "brandId": "7",
+  "modelId": "9956",
+  "yearId": "2024-6",
+  "precoDesejado": 300000,
+  "notasPessoais": "Carro em ótimo estado, único dono",
+  "conservacao": "BOM"
+}
+
+Valores válidos para "conservacao":
+  NOVO | BOM | REGULAR | RUIM
+
+Response:
+{
+  "id": 1,
+  "usuarioId": 1,
+  "fipeId": "009266-5",
+  "precoDesejado": 300000.0,
+  "precoFipe": 320333.0,
+  "statusResultado": "OTIMO_NEGOCIO",
+  "criado_a": "2026-05-04T14:30:00",
+  "conservacao": "BOM",
+  "historicoAtivo": "SIM",
+  "notasPessoais": "Carro em ótimo estado, único dono"
+}
+
+Valores possíveis para "statusResultado":
+  OTIMO_NEGOCIO | NA_MEDIA | ACIMA_DA_MEDIA | DIFICIL_DE_VENDER
+
+
+----------------------------------------------------
+8. LISTAR AVALIAÇÕES DO USUÁRIO
+----------------------------------------------------
+GET http://localhost:8080/sc/usuario/{usuarioId}
+
+Exemplo:
+GET http://localhost:8080/sc/usuario/1
+
+Response:
+[
+  {
+    "id": 1,
+    "usuarioId": 1,
+    "fipeId": "009266-5",
+    "precoDesejado": 300000.0,
+    "precoFipe": 320333.0,
+    "statusResultado": "OTIMO_NEGOCIO",
+    "criado_a": "2026-05-04T14:30:00",
+    "conservacao": "BOM",
+    "historicoAtivo": "SIM",
+    "notasPessoais": "Carro em ótimo estado, único dono"
+  }
+]
+
+
+----------------------------------------------------
+9. DESATIVAR AVALIAÇÃO (soft delete)
+----------------------------------------------------
+PATCH http://localhost:8080/sc/{id}
+
+Exemplo:
+PATCH http://localhost:8080/sc/1
+
+Response:
+{
+  "id": 1,
+  "usuarioId": 1,
+  "fipeId": "009266-5",
+  "precoDesejado": 300000.0,
+  "precoFipe": 320333.0,
+  "statusResultado": "OTIMO_NEGOCIO",
+  "criado_a": "2026-05-04T14:30:00",
+  "conservacao": "BOM",
+  "historicoAtivo": "NAO",
+  "notasPessoais": "Carro em ótimo estado, único dono"
+}
+
+OBS: "historicoAtivo" muda de "SIM" para "NAO".
+
+
+====================================================

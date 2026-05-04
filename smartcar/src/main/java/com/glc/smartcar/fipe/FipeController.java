@@ -36,7 +36,7 @@ public class FipeController {
     }
 
 
-    @GetMapping("marcas/{brandId}/modelos/{modelId}/anos/{yearId}")
+    @GetMapping("/marcas/{brandId}/modelos/{modelId}/anos/{yearId}")
     public FipeVeiculoDTO buscarVeiculoFipe(@PathVariable String brandId, @PathVariable String modelId,@PathVariable String yearId){
         return fipePort.obterPreco(brandId,modelId,yearId);
     }
