@@ -1,5 +1,6 @@
 package com.glc.smartcar.avaliacoes;
 
+import com.glc.smartcar.core.avaliacoes.ClassificacaoService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
