@@ -38,5 +38,10 @@ public class AvaliacaoResponseDTO {
         this.notasPessoais = notasPessoais;
     }
 
+    public AvaliacaoResponseDTO(Long id, Long usuarioId, String fipeId, Double precoDesejado, Double precoFipe, StatusResultado statusResultado, LocalDateTime criado_a, Conservacao conservacao, HistoricoAtivo historicoAtivo, String notasPessoais, String avaliacaoIA) {
+        this(id, usuarioId, fipeId, precoDesejado, precoFipe, statusResultado, criado_a, conservacao, historicoAtivo, notasPessoais);
+        this.avaliacaoIA = avaliacaoIA;
+    }
+
 }
 

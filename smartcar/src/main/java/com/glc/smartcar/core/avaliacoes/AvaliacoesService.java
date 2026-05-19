@@ -33,8 +33,7 @@ public class AvaliacoesService {
     }
 
     @Transactional
-    // AvaliacaoResponseDTO vou substituir para String para testes
-    public String criarAvaliacao(AvaliacaoRequestDTO dto) {
+    public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO dto) {
 
         FipeVeiculoDTO fipeVeiculoDTO = fipePort.obterPreco(
                 dto.getBrandId(), dto.getModelId(), dto.getYearId()
@@ -54,14 +53,12 @@ public class AvaliacoesService {
                 dto.getPrecoDesejado(), precoJusto
         );
 
-        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto,precoFipe, fipeVeiculoDTO.CodigoFipe(), status);
+        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, precoFipe, fipeVeiculoDTO.CodigoFipe(), status);
         Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
-        // codigo antigo pararia aqui: return avaliacoesMapper.toDTO(salvo);
-
 
         String mensagemFinal = processarAnaliseIa(fipeVeiculoDTO.Modelo(), dto, precoJusto, precoFipe, status);
 
-        return mensagemFinal;
+        return avaliacoesMapper.toDTO(salvo, mensagemFinal);
     }
 
     private String processarAnaliseIa(String modelo, AvaliacaoRequestDTO dto, double justo, double fipe, StatusResultado status) {

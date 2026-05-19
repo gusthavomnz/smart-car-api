@@ -41,17 +41,35 @@ public class AvaliacoesMapper {
         if (entity == null) {
             return null;
         }
-      return new AvaliacaoResponseDTO(
-              entity.getId(),
-              entity.getUsuarioId(),
-              entity.getFipeId(),
-              entity.getPrecoDesejado(),
-              entity.getPrecoFipe(),
-              entity.getStatusResultado(),
-              entity.getCriado_a(),
-              entity.getConservacao(),
-              entity.getHistoricoAtivo(),
-              entity.getNotasPessoais());
+        return new AvaliacaoResponseDTO(
+                entity.getId(),
+                entity.getUsuarioId(),
+                entity.getFipeId(),
+                entity.getPrecoDesejado(),
+                entity.getPrecoFipe(),
+                entity.getStatusResultado(),
+                entity.getCriado_a(),
+                entity.getConservacao(),
+                entity.getHistoricoAtivo(),
+                entity.getNotasPessoais());
+    }
+
+    public AvaliacaoResponseDTO toDTO(Avaliacoes entity, String avaliacaoIA) {
+        if (entity == null) {
+            return null;
+        }
+        return new AvaliacaoResponseDTO(
+                entity.getId(),
+                entity.getUsuarioId(),
+                entity.getFipeId(),
+                entity.getPrecoDesejado(),
+                entity.getPrecoFipe(),
+                entity.getStatusResultado(),
+                entity.getCriado_a(),
+                entity.getConservacao(),
+                entity.getHistoricoAtivo(),
+                entity.getNotasPessoais(),
+                avaliacaoIA);
     }
 
     public List<AvaliacaoResponseDTO> toDTOList(List<Avaliacoes> entities) {

@@ -19,9 +19,8 @@ public class AvaliacoesController {
     }
 
     @PostMapping
-    // Substituir AvaliacaoResponseDTO para String para testes
-    public String criarAvaliacao(@Valid @RequestBody AvaliacaoRequestDTO avaliacaoRequestDTO){
-        return avaliacoesService.criarAvaliacao(avaliacaoRequestDTO);
+    public ResponseEntity<AvaliacaoResponseDTO> criarAvaliacao(@Valid @RequestBody AvaliacaoRequestDTO avaliacaoRequestDTO){
+        return ResponseEntity.ok(avaliacoesService.criarAvaliacao(avaliacaoRequestDTO));
     }
 
     @PatchMapping("/{id}")
