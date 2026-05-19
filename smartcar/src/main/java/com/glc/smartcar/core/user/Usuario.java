@@ -27,6 +27,10 @@ public class Usuario {
     @Column(name = "senha",nullable = false)
     private String senha;
 
+    @Column(name = "enum", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
+
     @Column(name = "criado_a")
     private LocalDateTime criado_a;
 }
