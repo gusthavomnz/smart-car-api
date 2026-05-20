@@ -2,8 +2,10 @@ package com.glc.smartcar.core.avaliacoes;
 
 import com.glc.smartcar.core.avaliacoes.dto.AvaliacaoRequestDTO;
 import com.glc.smartcar.core.avaliacoes.dto.AvaliacaoResponseDTO;
+import com.glc.smartcar.core.user.Usuario;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,21 +21,20 @@ public class AvaliacoesController {
     }
 
     @PostMapping
-    public ResponseEntity<AvaliacaoResponseDTO> criarAvaliacao(@Valid @RequestBody AvaliacaoRequestDTO avaliacaoRequestDTO){
-        return ResponseEntity.ok(avaliacoesService.criarAvaliacao(avaliacaoRequestDTO));
+    public ResponseEntity<AvaliacaoResponseDTO> criarAvaliacao(@Valid @RequestBody AvaliacaoRequestDTO dto,
+                                                               @AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(avaliacoesService.criarAvaliacao(dto, usuario.getId()));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<AvaliacaoResponseDTO> excluirAvaliacao(@PathVariable Long id) {
-        var response = avaliacoesService.excluirAvaliacao(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<AvaliacaoResponseDTO> excluirAvaliacao(@PathVariable Long id,
+                                                                 @AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(avaliacoesService.excluirAvaliacao(id, usuario.getId()));
     }
 
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<AvaliacaoResponseDTO>> listarAvaliacoes(@PathVariable Long usuarioId) {
-        // Quando implementar SpringSecurity, não receber usuarioID no parametro e obter usuarioID via TokenJWT
-        List<AvaliacaoResponseDTO> lista = avaliacoesService.listarAvaliacoesPorUsuario(usuarioId);
-        return ResponseEntity.ok(lista);
+    @GetMapping
+    public ResponseEntity<List<AvaliacaoResponseDTO>> listarAvaliacoes(@AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(avaliacoesService.listarAvaliacoesPorUsuario(usuario.getId()));
     }
 
 }

@@ -15,11 +15,10 @@ public class AvaliacoesMapper {
 
 
 
-    public Avaliacoes toEntity(AvaliacaoRequestDTO dto, double precoFipe, String codigoFipe, StatusResultado status) {
+    public Avaliacoes toEntity(AvaliacaoRequestDTO dto, Long usuarioId, double precoFipe, String codigoFipe, StatusResultado status) {
         Avaliacoes entity = new Avaliacoes();
 
-
-        entity.setUsuarioId(dto.getUsuarioId());
+        entity.setUsuarioId(usuarioId);
         entity.setPrecoDesejado(dto.getPrecoDesejado());
         entity.setKmsRodados(dto.getKmsRodados());
         entity.setConservacao(dto.getConservacao());

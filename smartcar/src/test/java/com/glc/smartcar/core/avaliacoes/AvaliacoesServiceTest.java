@@ -39,7 +39,6 @@ class AvaliacoesServiceTest {
 
     private AvaliacaoRequestDTO criarDtoDeRequisicao() {
         AvaliacaoRequestDTO dto = new AvaliacaoRequestDTO();
-        dto.setUsuarioId(1L);
         dto.setBrandId("59");
         dto.setModelId("5940");
         dto.setYearId("2020-1");
@@ -80,13 +79,13 @@ class AvaliacoesServiceTest {
         when(servicoClassificacao.parseYearId("2020-1")).thenReturn(2020);
         when(servicoClassificacao.calcularPrecoJusto(48000.0, 2020, 50000.0, Conservacao.BOM)).thenReturn(46000.0);
         when(servicoClassificacao.classificarNegocio(45000.0, 46000.0)).thenReturn(StatusResultado.OTIMO_NEGOCIO);
-        when(mapeador.toEntity(dto, 48000.0, "001234-5", StatusResultado.OTIMO_NEGOCIO)).thenReturn(entidade);
+        when(mapeador.toEntity(dto, 1L, 48000.0, "001234-5", StatusResultado.OTIMO_NEGOCIO)).thenReturn(entidade);
         when(repositorioAvaliacoes.save(entidade)).thenReturn(entidade);
         when(porteIA.criarContexto(anyString())).thenReturn(List.of());
         when(porteIA.executarRequisicaoIA(anyList())).thenReturn("Luva compraria!");
         when(mapeador.toDTO(entidade, "Luva compraria!")).thenReturn(respostaEsperada);
 
-        AvaliacaoResponseDTO resultado = servicoAvaliacoes.criarAvaliacao(dto);
+        AvaliacaoResponseDTO resultado = servicoAvaliacoes.criarAvaliacao(dto, 1L);
 
         assertNotNull(resultado);
         verify(repositorioAvaliacoes).save(entidade);
@@ -105,13 +104,13 @@ class AvaliacoesServiceTest {
         when(servicoClassificacao.parseYearId(anyString())).thenReturn(2020);
         when(servicoClassificacao.calcularPrecoJusto(anyDouble(), anyInt(), anyDouble(), any())).thenReturn(46000.0);
         when(servicoClassificacao.classificarNegocio(anyDouble(), anyDouble())).thenReturn(StatusResultado.NA_MEDIA);
-        when(mapeador.toEntity(any(), anyDouble(), anyString(), any())).thenReturn(entidade);
+        when(mapeador.toEntity(any(), anyLong(), anyDouble(), anyString(), any())).thenReturn(entidade);
         when(repositorioAvaliacoes.save(any())).thenReturn(entidade);
         when(porteIA.criarContexto(anyString())).thenReturn(List.of());
         when(porteIA.executarRequisicaoIA(anyList())).thenReturn("Análise da IA");
         when(mapeador.toDTO(any(Avaliacoes.class), anyString())).thenReturn(new AvaliacaoResponseDTO());
 
-        servicoAvaliacoes.criarAvaliacao(dto);
+        servicoAvaliacoes.criarAvaliacao(dto, 1L);
 
         verify(porteFipe).obterPreco("59", "5940", "2020-1");
     }
@@ -129,7 +128,7 @@ class AvaliacoesServiceTest {
         when(repositorioAvaliacoes.save(entidade)).thenReturn(entidadeSalva);
         when(mapeador.toDTO(entidadeSalva)).thenReturn(respostaEsperada);
 
-        AvaliacaoResponseDTO resultado = servicoAvaliacoes.excluirAvaliacao(1L);
+        AvaliacaoResponseDTO resultado = servicoAvaliacoes.excluirAvaliacao(1L, 1L);
 
         assertNotNull(resultado);
         assertEquals(HistoricoAtivo.NAO, entidade.getHistoricoAtivo());
@@ -140,7 +139,7 @@ class AvaliacoesServiceTest {
     void deveLancarExcecaoQuandoAvaliacaoNaoEncontrada() {
         when(repositorioAvaliacoes.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> servicoAvaliacoes.excluirAvaliacao(99L))
+        assertThatThrownBy(() -> servicoAvaliacoes.excluirAvaliacao(99L, 1L))
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("Avaliação não encontrada");
     }
@@ -152,7 +151,7 @@ class AvaliacoesServiceTest {
         when(repositorioAvaliacoes.save(entidade)).thenReturn(entidade);
         when(mapeador.toDTO(entidade)).thenReturn(new AvaliacaoResponseDTO());
 
-        servicoAvaliacoes.excluirAvaliacao(1L);
+        servicoAvaliacoes.excluirAvaliacao(1L, 1L);
 
         assertEquals(HistoricoAtivo.NAO, entidade.getHistoricoAtivo());
     }
