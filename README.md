@@ -1,30 +1,26 @@
-# 🚘💸 SmartCar - Uma Solução inteligente para Precificação de Veículos
+# SmartCar — Precificação Inteligente de Veículos Usados
 
-###  Projeto desenvolvido para a matéria de Projeto Integrador I
+> Projeto desenvolvido para a disciplina de **Projeto Integrador I**
 
-
-
-## 🏗️ Modelagem do Sistema (UML)
-### Abaixo está o diagrama de classes que representa a estrutura do banco de dados e as relações entre as entidades:
-![Diagrama UML do SmartCar](assets/SmartCarUML.png)
-
-
-
-# SmartCar API
-
-Guia inteligente para avaliação e venda de veículos usados. A API analisa anúncios com base na tabela FIPE, quilometragem e conservação do veículo, classificando negócios e gerando uma explicação humanizada via IA.
+API REST que analisa anúncios de veículos usados cruzando preço FIPE, quilometragem e estado de conservação, classificando o negócio e gerando uma explicação humanizada via IA (Groq).
 
 ---
 
 ## Tecnologias
 
-- Java 17 + Spring Boot 3.2
-- Spring Security + JWT (JJWT 0.12)
-- Spring Data JPA + MySQL
-- Flyway
-- OpenFeign
-- Groq API (IA)
-- Lombok
+| Camada | Stack |
+|--------|-------|
+| Linguagem & Runtime | Java 17 + Spring Boot 3.2 |
+| Segurança | Spring Security + JWT (JJWT 0.12) |
+| Persistência | Spring Data JPA + MySQL + Flyway |
+| Integrações | OpenFeign · Groq API |
+| Utilitários | Lombok |
+
+---
+
+## Modelagem (UML)
+
+![Diagrama UML do SmartCar](assets/SmartCarUML.png)
 
 ---
 
@@ -55,43 +51,29 @@ src/main/java/com/glc/smartcar/
 │   │   ├── AvaliacoesRepository    # Queries JPA
 │   │   ├── ClassificacaoService    # Calcula preço justo e classifica o negócio
 │   │   ├── Avaliacoes              # Entidade JPA
-│   │   ├── dto/
-│   │   │   ├── AvaliacaoRequestDTO
-│   │   │   └── AvaliacaoResponseDTO
-│   │   └── enums/
-│   │       ├── Conservacao         # NOVO, BOM, REGULAR, RUIM
-│   │       ├── HistoricoAtivo      # SIM, NAO (soft delete)
-│   │       └── StatusResultado     # OTIMO_NEGOCIO, NA_MEDIA, ACIMA_DA_MEDIA, DIFICIL_DE_VENDER
+│   │   └── dto/
+│   │       ├── AvaliacaoRequestDTO
+│   │       └── AvaliacaoResponseDTO
 │   │
 │   └── user/
-│       ├── Usuario                 # Entidade JPA + implementação de UserDetails
-│       ├── UserDetailsImpl         # Carrega usuário pelo email para o Spring Security
+│       ├── Usuario                 # Entidade JPA + UserDetails
+│       ├── UserDetailsImpl         # Carrega usuário pelo email
 │       ├── UserRepository          # findByEmail, existsByEmail
-│       ├── UsuarioMapper           # Conversão entre entidade e DTOs
-│       ├── UsuarioService          # Service de operações do usuário
+│       ├── UsuarioMapper
+│       ├── UsuarioService
 │       └── UserRoleEnum            # USER, ADMIN
 │
 └── integration/
     ├── fipe/
-    │   ├── FipeController          # GET /fipe, /fipe/marcas/{id}/modelos, etc.
-    │   ├── FipeAdapter             # Implementação do FipePort via Feign
-    │   ├── FipeClient              # Feign client para a API da FIPE
-    │   ├── port/
-    │   │   └── FipePort            # Interface (porta de saída)
-    │   └── dto/
-    │       ├── FipeNameAndCode
-    │       └── FipeVeiculoDTO
+    │   ├── FipeController
+    │   ├── FipeAdapter
+    │   ├── FipeClient
+    │   └── port/FipePort
     │
     └── ia/
-        ├── IaAdapter               # Implementação do IaPort — monta e envia prompt
-        ├── IaClient                # Feign client para a Groq API
-        ├── port/
-        │   └── IaPort              # Interface (porta de saída)
-        └── dto/
-            ├── Message
-            ├── iaRequest
-            ├── iaResponse
-            └── Choice
+        ├── IaAdapter
+        ├── IaClient
+        └── port/IaPort
 ```
 
 ---
@@ -99,19 +81,22 @@ src/main/java/com/glc/smartcar/
 ## Endpoints
 
 ### Auth — público
+
 | Método | Rota | Descrição |
 |--------|------|-----------|
 | POST | `/auth/cadastrar` | Cadastra novo usuário |
 | POST | `/auth/login` | Retorna token JWT |
 
 ### Avaliações — requer token
+
 | Método | Rota | Descrição |
 |--------|------|-----------|
-| POST | `/sc` | Cria uma avaliação de veículo |
+| POST | `/sc` | Cria avaliação de veículo |
 | GET | `/sc` | Lista avaliações ativas do usuário |
-| PATCH | `/sc/{id}` | Desativa uma avaliação (soft delete) |
+| PATCH | `/sc/{id}` | Desativa avaliação (soft delete) |
 
 ### FIPE — requer token
+
 | Método | Rota | Descrição |
 |--------|------|-----------|
 | GET | `/fipe` | Lista marcas |
@@ -123,26 +108,47 @@ src/main/java/com/glc/smartcar/
 
 ## Lógica de Classificação
 
-O preço justo é calculado com base no preço FIPE ajustado por dois fatores:
+O **preço justo** é calculado a partir do preço FIPE ajustado por dois fatores:
 
-- **Quilometragem:** decaimento exponencial — veículos acima da média de 14.000 km/ano são penalizados, abaixo recebem bônus (limite: -40% a +15%)
-- **Conservação:** escala de impacto moderado sobre o preço (limite: -20% a +20%)
+- **Quilometragem:** decaimento exponencial — acima de 14.000 km/ano penaliza, abaixo bonifica (intervalo: −40% a +15%)
+- **Conservação:** impacto moderado no preço (intervalo: −20% a +20%)
 
-| Classificação | Critério |
-|---------------|----------|
-| OTIMO_NEGOCIO | Preço anunciado ≤ 90% do preço justo |
-| NA_MEDIA | 90% a 105% |
-| ACIMA_DA_MEDIA | 105% a 120% |
-| DIFICIL_DE_VENDER | Acima de 120% |
+| Status | Critério |
+|--------|----------|
+| `OTIMO_NEGOCIO` | Preço anunciado ≤ 90% do preço justo |
+| `NA_MEDIA` | 90% — 105% |
+| `ACIMA_DA_MEDIA` | 105% — 120% |
+| `DIFICIL_DE_VENDER` | > 120% |
 
 ---
 
-## Variáveis de Ambiente
+## Como Executar
+
+### Pré-requisitos
+
+- Java 17+
+- MySQL rodando localmente
+- Chave da [Groq API](https://console.groq.com)
+
+### Variáveis de ambiente
 
 | Variável | Descrição |
 |----------|-----------|
 | `JWT_KEY` | Chave secreta para assinar os tokens JWT |
-| `JWT_EXPIRATION` | Tempo de expiração do token em ms (ex: `86400000` para 24h) |
+| `JWT_EXPIRATION` | Expiração em ms — ex.: `86400000` (24 h) |
 | `API_KEY` | Chave da Groq API |
 | `SEU_USUARIO` | Usuário do banco MySQL |
 | `SUA_SENHA` | Senha do banco MySQL |
+
+### Rodando
+
+```bash
+# Clone o repositório
+git clone https://github.com/gusthavomnz/smart-car-api.git
+cd smart-car-api
+
+# Configure as variáveis de ambiente e execute
+./mvnw spring-boot:run
+```
+
+O Flyway aplicará as migrations automaticamente ao subir a aplicação.
