@@ -1,14 +1,11 @@
-package com.glc.smartcar.core.user.dto;
+package com.glc.smartcar.core.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class CadastroRequestDTO {
-
-    @NotBlank(message = "Nome é obrigatório")
-    private String nome;
+public class AuthLoginRequest {
 
     @NotBlank(message = "Email é obrigatório")
     @Email(message = "Email inválido")

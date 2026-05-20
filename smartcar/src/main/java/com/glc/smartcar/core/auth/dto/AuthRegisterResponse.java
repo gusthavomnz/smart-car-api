@@ -1,4 +1,4 @@
-package com.glc.smartcar.core.user.dto;
+package com.glc.smartcar.core.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-public class UsuarioResponseDTO {
+public class AuthRegisterResponse {
 
     private Long id;
     private String nome;

@@ -1,6 +1,6 @@
 package com.glc.smartcar.core.user;
 
-public enum Role {
+public enum UserRoleEnum {
     USER,
     ADMIN
 
