@@ -1,0 +1,527 @@
+╔══════════════════════════════════════════════════════════════════╗
+║              SMARTCAR  –  DOCUMENTAÇÃO DA API                    ║
+║              Guia para consumo pelo Front End                    ║
+╚══════════════════════════════════════════════════════════════════╝
+
+  Base URL ......... http://localhost:8080
+  Content-Type ..... application/json  (em todas as requisições)
+  Autenticação ..... Bearer Token JWT  (Authorization: Bearer <token>)
+  Validade token ... 24 horas
+  Formato datas .... ISO 8601  →  "2026-05-19T14:30:00"
+
+
+════════════════════════════════════════════════════════════════════
+  REGRAS DE AUTENTICAÇÃO
+════════════════════════════════════════════════════════════════════
+
+  Rotas PÚBLICAS (sem token):
+    • POST  /auth/cadastrar
+    • POST  /auth/login
+
+  Rotas PROTEGIDAS (token obrigatório):
+    • Qualquer outra rota — incluindo todas as /fipe e /sc
+
+  Como enviar o token:
+    Header:  Authorization: Bearer eyJhbGci...
+
+  Erros de autenticação:
+    401 Unauthorized  →  token ausente, inválido ou expirado
+    403 Forbidden     →  token válido, mas sem permissão para o recurso
+
+
+════════════════════════════════════════════════════════════════════
+  1.  AUTH  —  ROTAS PÚBLICAS
+════════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────────
+  POST /auth/cadastrar  —  Cadastrar novo usuário
+────────────────────────────────────────────────────────────────────
+
+  Request Body:
+  ┌─────────────────────────────────────────────────────────┐
+  │ {                                                       │
+  │   "nome":  String   (obrigatório, não pode ser vazio)  │
+  │   "email": String   (obrigatório, formato e-mail)      │
+  │   "senha": String   (obrigatório, não pode ser vazio)  │
+  │ }                                                       │
+  └─────────────────────────────────────────────────────────┘
+
+  Response  →  HTTP 201 CREATED
+  ┌─────────────────────────────────────────────────────────┐
+  │ {                                                       │
+  │   "id":       Long           ex: 1                     │
+  │   "nome":     String         ex: "João Silva"          │
+  │   "email":    String         ex: "joao@email.com"      │
+  │   "criado_a": LocalDateTime  ex: "2026-05-19T10:30:00" │
+  │ }                                                       │
+  └─────────────────────────────────────────────────────────┘
+
+  Erros possíveis:
+    400 Bad Request  →  campo inválido ou faltando
+    409 Conflict     →  e-mail já cadastrado
+
+  Exemplo de requisição:
+    {
+      "nome":  "João Silva",
+      "email": "joao@email.com",
+      "senha": "minhasenha123"
+    }
+
+  Exemplo de resposta (201):
+    {
+      "id":       1,
+      "nome":     "João Silva",
+      "email":    "joao@email.com",
+      "criado_a": "2026-05-19T10:30:00"
+    }
+
+
+────────────────────────────────────────────────────────────────────
+  POST /auth/login  —  Fazer login e receber o token JWT
+────────────────────────────────────────────────────────────────────
+
+  Request Body:
+  ┌─────────────────────────────────────────────────────────┐
+  │ {                                                       │
+  │   "email": String   (obrigatório, formato e-mail)      │
+  │   "senha": String   (obrigatório, não pode ser vazio)  │
+  │ }                                                       │
+  └─────────────────────────────────────────────────────────┘
+
+  Response  →  HTTP 200 OK
+  ┌─────────────────────────────────────────────────────────┐
+  │ {                                                       │
+  │   "token": String   (guardar este valor para usar nas  │
+  │                       próximas requisições)            │
+  │ }                                                       │
+  └─────────────────────────────────────────────────────────┘
+
+  Erros possíveis:
+    400 Bad Request   →  campo inválido ou faltando
+    401 Unauthorized  →  e-mail ou senha incorretos
+
+  Exemplo de requisição:
+    {
+      "email": "joao@email.com",
+      "senha": "minhasenha123"
+    }
+
+  Exemplo de resposta (200):
+    {
+      "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2FvQGVtYWlsLm..."
+    }
+
+
+════════════════════════════════════════════════════════════════════
+  2.  AVALIAÇÕES (/sc)  —  ROTAS PROTEGIDAS
+════════════════════════════════════════════════════════════════════
+
+  IMPORTANTE: o usuário é identificado pelo token.
+              NÃO enviar usuarioId no body — ele é lido automaticamente.
+
+────────────────────────────────────────────────────────────────────
+  POST /sc  —  Criar nova avaliação de veículo
+────────────────────────────────────────────────────────────────────
+
+  Header:  Authorization: Bearer <token>
+
+  Request Body:
+  ┌────────────────────────────────────────────────────────────────────┐
+  │ {                                                                  │
+  │   "kmsRodados":    double       (obrigatório)                     │
+  │   "brandId":       String       (obrigatório – código da marca)   │
+  │   "modelId":       String       (obrigatório – código do modelo)  │
+  │   "yearId":        String       (obrigatório – código do ano,     │
+  │                                  formato "2020-1")                │
+  │   "precoDesejado": double       (obrigatório – preço anunciado)   │
+  │   "notasPessoais": String       (obrigatório)                     │
+  │   "conservacao":   String/Enum  (obrigatório)                     │
+  │                    Valores aceitos:                               │
+  │                      "NOVO"     →  veículo novo / como novo       │
+  │                      "BOM"      →  bom estado                     │
+  │                      "REGULAR"  →  estado regular                 │
+  │                      "RUIM"     →  mal conservado                 │
+  │ }                                                                  │
+  └────────────────────────────────────────────────────────────────────┘
+
+  Response  →  HTTP 200 OK
+  ┌────────────────────────────────────────────────────────────────────┐
+  │ {                                                                  │
+  │   "id":              Long          ex: 1                          │
+  │   "usuarioId":       Long          ex: 3                          │
+  │   "fipeId":          String        ex: "001015"                   │
+  │   "precoDesejado":   Double        ex: 45000.0                    │
+  │   "precoFipe":       Double        ex: 48500.0                    │
+  │   "statusResultado": String/Enum                                  │
+  │                      Valores possíveis:                           │
+  │                        "OTIMO_NEGOCIO"     →  ótima compra        │
+  │                        "NA_MEDIA"          →  preço justo         │
+  │                        "ACIMA_DA_MEDIA"    →  acima do mercado    │
+  │                        "DIFICIL_DE_VENDER" →  preço muito alto    │
+  │   "criado_a":        LocalDateTime  ex: "2026-05-19T10:45:00"    │
+  │   "conservacao":     String/Enum    ("NOVO"|"BOM"|"REGULAR"|"RUIM")│
+  │   "historicoAtivo":  String/Enum    ("SIM"|"NAO")                 │
+  │   "notasPessoais":   String                                       │
+  │   "avaliacaoIA":     String         (análise gerada por IA;       │
+  │                                      pode ser null)              │
+  │ }                                                                  │
+  └────────────────────────────────────────────────────────────────────┘
+
+  Erros possíveis:
+    400 Bad Request   →  campo inválido ou faltando
+    401 Unauthorized  →  token inválido/ausente
+
+  Exemplo de requisição:
+    {
+      "kmsRodados":    85000,
+      "brandId":       "1",
+      "modelId":       "5",
+      "yearId":        "2020-1",
+      "precoDesejado": 45000,
+      "notasPessoais": "Carro bem cuidado, revisões em dia",
+      "conservacao":   "BOM"
+    }
+
+  Exemplo de resposta (200):
+    {
+      "id":              1,
+      "usuarioId":       3,
+      "fipeId":          "001015",
+      "precoDesejado":   45000.0,
+      "precoFipe":       48500.0,
+      "statusResultado": "OTIMO_NEGOCIO",
+      "criado_a":        "2026-05-19T10:45:00",
+      "conservacao":     "BOM",
+      "historicoAtivo":  "SIM",
+      "notasPessoais":   "Carro bem cuidado, revisões em dia",
+      "avaliacaoIA":     "Excelente negócio! O veículo está sendo anunciado..."
+    }
+
+
+────────────────────────────────────────────────────────────────────
+  GET /sc  —  Listar avaliações do usuário autenticado
+────────────────────────────────────────────────────────────────────
+
+  Header:  Authorization: Bearer <token>
+
+  Query Params: nenhum
+  Request Body: nenhum
+
+  Response  →  HTTP 200 OK  (array, pode ser vazio [])
+  ┌────────────────────────────────────────────────────────────────────┐
+  │ [                                                                  │
+  │   {                                                                │
+  │     "id":              Long                                        │
+  │     "usuarioId":       Long                                        │
+  │     "fipeId":          String                                      │
+  │     "precoDesejado":   Double                                      │
+  │     "precoFipe":       Double                                      │
+  │     "statusResultado": String/Enum                                 │
+  │     "criado_a":        LocalDateTime                               │
+  │     "conservacao":     String/Enum                                 │
+  │     "historicoAtivo":  String/Enum                                 │
+  │     "notasPessoais":   String                                      │
+  │     "avaliacaoIA":     String  (pode ser null)                     │
+  │   },                                                               │
+  │   ...                                                              │
+  │ ]                                                                  │
+  └────────────────────────────────────────────────────────────────────┘
+
+  NOTA: retorna apenas avaliações ATIVAS (historicoAtivo = "SIM").
+        Avaliações desativadas não aparecem nesta listagem.
+
+  Erros possíveis:
+    401 Unauthorized  →  token inválido/ausente
+
+
+────────────────────────────────────────────────────────────────────
+  PATCH /sc/{id}  —  Desativar uma avaliação (soft delete)
+────────────────────────────────────────────────────────────────────
+
+  Header:  Authorization: Bearer <token>
+
+  Path Variable:
+    id  →  Long  (ID da avaliação a ser desativada)
+
+  Request Body: nenhum
+
+  Response  →  HTTP 200 OK  (retorna a avaliação atualizada)
+  ┌────────────────────────────────────────────────────────────────────┐
+  │ {                                                                  │
+  │   "id":              Long                                          │
+  │   "usuarioId":       Long                                          │
+  │   "fipeId":          String                                        │
+  │   "precoDesejado":   Double                                        │
+  │   "precoFipe":       Double                                        │
+  │   "statusResultado": String/Enum                                   │
+  │   "criado_a":        LocalDateTime                                 │
+  │   "conservacao":     String/Enum                                   │
+  │   "historicoAtivo":  "NAO"    ← sempre NAO após desativar         │
+  │   "notasPessoais":   String                                        │
+  │   "avaliacaoIA":     String  (pode ser null)                       │
+  │ }                                                                  │
+  └────────────────────────────────────────────────────────────────────┘
+
+  NOTA: a avaliação NÃO é deletada do banco. O campo historicoAtivo
+        é alterado de "SIM" para "NAO" (soft delete).
+        Após isso, ela não aparece mais no GET /sc.
+
+  Erros possíveis:
+    401 Unauthorized  →  token inválido/ausente
+    403 Forbidden     →  a avaliação pertence a outro usuário
+    404 Not Found     →  avaliação não encontrada
+
+
+════════════════════════════════════════════════════════════════════
+  3.  FIPE (/fipe)  —  ROTAS PROTEGIDAS
+════════════════════════════════════════════════════════════════════
+
+  IMPORTANTE: todas as rotas /fipe exigem token JWT.
+
+  Fluxo de uso das rotas FIPE:
+    1. GET /fipe                                    → obter código da marca
+    2. GET /fipe/marcas/{brandId}/modelos           → obter código do modelo
+    3. GET /fipe/marcas/{brandId}/modelos/{modelId}/anos         → obter yearId
+    4. (opcional) GET /fipe/.../anos/{yearId}       → ver preço FIPE
+
+  Os valores "code" retornados em cada etapa são usados como
+  parâmetros na etapa seguinte e no POST /sc.
+
+────────────────────────────────────────────────────────────────────
+  GET /fipe  —  Listar todas as marcas
+────────────────────────────────────────────────────────────────────
+
+  Header:  Authorization: Bearer <token>
+  Request Body: nenhum
+
+  Response  →  HTTP 200 OK
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ [                                                               │
+  │   {                                                             │
+  │     "name":  String   (nome da marca)                          │
+  │     "code":  String   (código → usar como brandId)             │
+  │   },                                                            │
+  │   ...                                                           │
+  │ ]                                                               │
+  └─────────────────────────────────────────────────────────────────┘
+
+  ⚠ ATENÇÃO: os campos se chamam "name" e "code" (em inglês).
+              NÃO são "nome" e "codigo".
+
+  Exemplo de resposta:
+    [
+      { "name": "Fiat",       "code": "1"  },
+      { "name": "Volkswagen", "code": "2"  },
+      { "name": "Chevrolet",  "code": "3"  }
+    ]
+
+
+────────────────────────────────────────────────────────────────────
+  GET /fipe/marcas/{brandId}/modelos  —  Listar modelos de uma marca
+────────────────────────────────────────────────────────────────────
+
+  Header:  Authorization: Bearer <token>
+
+  Path Variable:
+    brandId  →  String  (código da marca obtido em GET /fipe)
+
+  Response  →  HTTP 200 OK
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ [                                                               │
+  │   {                                                             │
+  │     "name":  String   (nome do modelo)                         │
+  │     "code":  String   (código → usar como modelId)             │
+  │   },                                                            │
+  │   ...                                                           │
+  │ ]                                                               │
+  └─────────────────────────────────────────────────────────────────┘
+
+  Exemplo de resposta:
+    [
+      { "name": "Uno",   "code": "5"   },
+      { "name": "Palio", "code": "6"   },
+      { "name": "Strada","code": "147" }
+    ]
+
+
+────────────────────────────────────────────────────────────────────
+  GET /fipe/marcas/{brandId}/modelos/{modelId}/anos
+                                       —  Listar anos de um modelo
+────────────────────────────────────────────────────────────────────
+
+  Header:  Authorization: Bearer <token>
+
+  Path Variables:
+    brandId  →  String  (código da marca)
+    modelId  →  String  (código do modelo)
+
+  Response  →  HTTP 200 OK
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ [                                                               │
+  │   {                                                             │
+  │     "name":  String   (ex: "2020 Gasolina")                    │
+  │     "code":  String   (código → usar como yearId no POST /sc   │
+  │                         e no próximo endpoint)                 │
+  │   },                                                            │
+  │   ...                                                           │
+  │ ]                                                               │
+  └─────────────────────────────────────────────────────────────────┘
+
+  NOTA: o "code" dos anos segue o formato "AAAA-C"
+        onde AAAA é o ano e C é o tipo de combustível (ex: "2020-1").
+
+  Exemplo de resposta:
+    [
+      { "name": "2022 Gasolina", "code": "2022-1" },
+      { "name": "2021 Gasolina", "code": "2021-1" },
+      { "name": "2020 Gasolina", "code": "2020-1" }
+    ]
+
+
+────────────────────────────────────────────────────────────────────
+  GET /fipe/marcas/{brandId}/modelos/{modelId}/anos/{yearId}
+                                       —  Obter preço FIPE do veículo
+────────────────────────────────────────────────────────────────────
+
+  Header:  Authorization: Bearer <token>
+
+  Path Variables:
+    brandId  →  String  (código da marca)
+    modelId  →  String  (código do modelo)
+    yearId   →  String  (código do ano, ex: "2020-1")
+
+  Response  →  HTTP 200 OK
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ {                                                               │
+  │   "price":          String    ex: "R$ 48.500,00"               │
+  │   "brand":          String    ex: "Fiat"                       │
+  │   "model":          String    ex: "Uno"                        │
+  │   "modelYear":      Integer   ex: 2020                         │
+  │   "fuel":           String    ex: "Gasolina"                   │
+  │   "codeFipe":       String    ex: "001015-9"                   │
+  │   "referenceMonth": String    ex: "maio de 2026"               │
+  │ }                                                               │
+  └─────────────────────────────────────────────────────────────────┘
+
+  ⚠ ATENÇÃO: os campos usam nomes em inglês conforme acima.
+              price, brand, model, modelYear, fuel, codeFipe, referenceMonth
+
+  Exemplo de resposta:
+    {
+      "price":          "R$ 48.500,00",
+      "brand":          "Fiat",
+      "model":          "Uno",
+      "modelYear":      2020,
+      "fuel":           "Gasolina",
+      "codeFipe":       "001015-9",
+      "referenceMonth": "maio de 2026"
+    }
+
+
+════════════════════════════════════════════════════════════════════
+  ENUMS — TODOS OS VALORES ACEITOS E RETORNADOS
+════════════════════════════════════════════════════════════════════
+
+  conservacao  (enviado no POST /sc, retornado nas respostas)
+  ┌──────────────────────────────────────────────────────────────┐
+  │  "NOVO"     →  veículo novo ou como novo                    │
+  │  "BOM"      →  bom estado de conservação                    │
+  │  "REGULAR"  →  estado regular                               │
+  │  "RUIM"     →  mal conservado                               │
+  └──────────────────────────────────────────────────────────────┘
+
+  statusResultado  (retornado pelo sistema após análise)
+  ┌──────────────────────────────────────────────────────────────┐
+  │  "OTIMO_NEGOCIO"     →  ótimo negócio, preço abaixo do justo│
+  │  "NA_MEDIA"          →  preço dentro da média de mercado    │
+  │  "ACIMA_DA_MEDIA"    →  preço acima da média de mercado     │
+  │  "DIFICIL_DE_VENDER" →  preço muito acima, difícil de vender│
+  └──────────────────────────────────────────────────────────────┘
+
+  historicoAtivo  (retornado nas respostas)
+  ┌──────────────────────────────────────────────────────────────┐
+  │  "SIM"  →  avaliação ativa (aparece no histórico)           │
+  │  "NAO"  →  avaliação desativada (ocultada do histórico)     │
+  └──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════
+  TABELA RESUMO DE TODAS AS ROTAS
+════════════════════════════════════════════════════════════════════
+
+  Método  Rota                                              Auth?   Status
+  ──────  ────────────────────────────────────────────────  ──────  ──────
+  POST    /auth/cadastrar                                   NÃO     201
+  POST    /auth/login                                       NÃO     200
+  POST    /sc                                               SIM     200
+  GET     /sc                                               SIM     200
+  PATCH   /sc/{id}                                          SIM     200
+  GET     /fipe                                             SIM     200
+  GET     /fipe/marcas/{brandId}/modelos                    SIM     200
+  GET     /fipe/marcas/{brandId}/modelos/{modelId}/anos     SIM     200
+  GET     /fipe/marcas/{brandId}/modelos/{modelId}/anos/    SIM     200
+          {yearId}
+
+
+════════════════════════════════════════════════════════════════════
+  ERROS ESPERADOS
+════════════════════════════════════════════════════════════════════
+
+  HTTP  Situação
+  ────  ─────────────────────────────────────────────────────────
+  400   Campos obrigatórios faltando ou em formato inválido
+  401   Token ausente, expirado ou inválido
+  403   Tentativa de alterar recurso de outro usuário
+  404   Avaliação não encontrada pelo ID informado
+  409   E-mail já cadastrado (POST /auth/cadastrar)
+
+
+════════════════════════════════════════════════════════════════════
+  FLUXO COMPLETO SUGERIDO PARA O FRONT END
+════════════════════════════════════════════════════════════════════
+
+  ① Autenticação
+      POST /auth/cadastrar   →  criar conta
+      POST /auth/login       →  obter token (salvar no localStorage)
+
+  ② Selecionar veículo (dropdowns em cascata)
+      GET /fipe                                          → lista marcas
+      GET /fipe/marcas/{brandId}/modelos                 → lista modelos
+      GET /fipe/marcas/{brandId}/modelos/{modelId}/anos  → lista anos
+      (opcional) GET /fipe/.../anos/{yearId}             → ver preço FIPE
+
+  ③ Avaliar veículo
+      POST /sc  (com brandId, modelId, yearId, precoDesejado, etc.)
+      → exibir statusResultado e avaliacaoIA ao usuário
+
+  ④ Histórico
+      GET /sc  →  listar avaliações ativas do usuário
+
+  ⑤ Remover do histórico
+      PATCH /sc/{id}  →  desativa a avaliação (não exclui)
+
+
+════════════════════════════════════════════════════════════════════
+  OBSERVAÇÕES FINAIS IMPORTANTES
+════════════════════════════════════════════════════════════════════
+
+  1. NÃO enviar usuarioId no body.
+     O backend identifica o usuário pelo token JWT automaticamente.
+
+  2. Os campos de resposta das rotas /fipe usam nomes em INGLÊS:
+     "name", "code", "price", "brand", "model", "modelYear",
+     "fuel", "codeFipe", "referenceMonth"
+
+  3. Os códigos brandId, modelId e yearId são sempre String,
+     mesmo que pareçam números (ex: "1", "5", "2020-1").
+
+  4. O campo "avaliacaoIA" pode vir como null dependendo do
+     serviço de IA estar disponível.
+
+  5. GET /sc retorna SOMENTE avaliações com historicoAtivo = "SIM".
+     Avaliações desativadas via PATCH não aparecem na listagem.
+
+  6. Ao cadastrar (POST /auth/cadastrar), a resposta é 201 CREATED,
+     não 200 OK. Ajustar o tratamento de status no front end.
+
+════════════════════════════════════════════════════════════════════

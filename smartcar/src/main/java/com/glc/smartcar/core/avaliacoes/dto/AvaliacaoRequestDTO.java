@@ -8,8 +8,6 @@ import lombok.Data;
 @Data
 public class AvaliacaoRequestDTO {
 
-    private Long usuarioId;
-
     @NotNull(message = "Informe os km's rodados do veículo. ")
     private double kmsRodados;
 

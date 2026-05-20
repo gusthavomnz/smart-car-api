@@ -8,8 +8,10 @@ import com.glc.smartcar.integration.fipe.dto.FipeVeiculoDTO;
 import com.glc.smartcar.integration.fipe.port.FipePort;
 import com.glc.smartcar.integration.ia.port.IaPort;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class AvaliacoesService {
     }
 
     @Transactional
-    public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO dto) {
+    public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO dto, Long usuarioId) {
 
         FipeVeiculoDTO fipeVeiculoDTO = fipePort.obterPreco(
                 dto.getBrandId(), dto.getModelId(), dto.getYearId()
@@ -53,7 +55,7 @@ public class AvaliacoesService {
                 dto.getPrecoDesejado(), precoJusto
         );
 
-        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, precoFipe, fipeVeiculoDTO.CodigoFipe(), status);
+        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipeVeiculoDTO.CodigoFipe(), status);
         Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
 
         String mensagemFinal = processarAnaliseIa(fipeVeiculoDTO.Modelo(), dto, precoJusto, precoFipe, status);
@@ -73,9 +75,13 @@ public class AvaliacoesService {
 
 
     @Transactional
-    public AvaliacaoResponseDTO excluirAvaliacao(Long id) {
+    public AvaliacaoResponseDTO excluirAvaliacao(Long id, Long usuarioId) {
         Avaliacoes a = avaliacoesRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Avaliação não encontrada"));
+
+        if (!a.getUsuarioId().equals(usuarioId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para excluir esta avaliação");
+        }
 
         a.setHistoricoAtivo(HistoricoAtivo.NAO);
         return avaliacoesMapper.toDTO(avaliacoesRepository.save(a));
