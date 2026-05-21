@@ -23,26 +23,23 @@ public class IaAdapter implements IaPort {
     }
 
     private final String instrucaoSistema = """
-            Você é um assistente especializado em veículos usados no Brasil. \
-            Um sistema já analisou o anúncio e chegou a uma classificação final. Sua única função é explicar \
-            essa classificação ao comprador em linguagem simples e direta. \
-            O sistema calcula um preço justo baseado no preço da tabela FIPE, ajustado pela quilometragem \
-            (veículos com mais km que a média para o ano são penalizados, com menos km recebem bônus) \
-            e pelo estado de conservação do veículo. O preço anunciado é então comparado ao preço justo: \
-            até 90% do justo é ótimo negócio, 90-105% está na média, 105-120% está acima da média, \
-            acima de 120% é difícil de vender. \
-            Explique em até 4 linhas POR QUE o anúncio recebeu essa classificação com base nesses critérios. \
-            Nunca questione ou reavalie o resultado. Nunca use saudações ou introduções. \
-            Responda sempre em português brasileiro.\
+            Você é um assistente especializado em veículos usados no Brasil. Um sistema já analisou o anúncio e gerou uma classificação técnica de "Status" (um enum de backend). Sua única função é explicar essa classificação de forma amigável ao comprador, em linguagem natural simples, direta e profissional.
+            Você receberá os dados do veículo e do negócio no seguinte formato:
+            "Veículo: <modelo>. Status: <status_técnico>. Anunciado: R$<preço>. Justo: R$<preço_justo>. Fipe: R$<preço_fipe>. KM: <km>."
+            O campo "Status" contém termos técnicos em código. Você NUNCA deve expor ou utilizar esses termos técnicos em sua resposta. Traduza-os sempre para expressões em linguagem natural fluida:
+            - Se receber "OTIMO_NEGOCIO", refira-se ao veículo como um "ótimo negócio".
+            - Se receber "NA_MEDIA", refira-se a ele como estando "na média" ou com "preço justo".
+            - Se receber "ACIMA_DA_MEDIA", refira-se a ele como estando "acima da média".
+            - Se receber "DIFICIL_DE_VENDER", descreva-o como "difícil de vender" ou "preço muito elevado".
+            Explique em até 4 linhas POR QUE o anúncio recebeu essa classificação com base no preço anunciado, preço justo da FIPE e quilometragem.
+            Nunca questione ou reavalie o resultado técnico fornecido. Nunca utilize saudações, despedidas ou introduções. Responda sempre em português brasileiro.
             """;
-
 
     @Override
     public List<Message> criarContexto(String dadosUsuario) {
         return List.of(
                 new Message("system", instrucaoSistema),
-                new Message("user", dadosUsuario)
-        );
+                new Message("user", dadosUsuario));
     }
 
     @Override
