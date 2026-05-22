@@ -1,24 +1,31 @@
-# SmartCar — Precificação Inteligente de Veículos Usados
+# SmartCar — Precificação Inteligente de Veículos 
 
-> Projeto desenvolvido para a disciplina de **Projeto Integrador I**
+## Projeto desenvolvido para a disciplina de **Projeto Integrador I**
 
-API REST que analisa anúncios de veículos usados cruzando preço FIPE, quilometragem e estado de conservação, classificando o negócio e gerando uma explicação humanizada via IA (Groq).
 
+ <h2> API REST da SmartCar — Sistema que ajuda compradores leigos a identificar se
+um anúncio de veículo vale a pena. O usuário cadastra preço anunciado,
+quilometragem, estado de conservação e notas pessoais; o sistema consulta o
+preço FIPE e aplica um modelo heurístico próprio para classificar o negócio.
+A Groq API explica ao usuário o raciocínio por trás da classificação em
+linguagem acessível.  <h2> 
 ---
 
-## Tecnologias
+## Tecnologias 🛠️
 
-| Camada | Stack |
-|--------|-------|
-| Linguagem & Runtime | Java 17 + Spring Boot 3.2 |
-| Segurança | Spring Security + JWT (JJWT 0.12) |
-| Persistência | Spring Data JPA + MySQL + Flyway |
-| Integrações | OpenFeign · Groq API |
-| Utilitários | Lombok |
+**Backend:** Java 17 · Spring Boot 3.2  
+**Banco de Dados:** MySQL · Flyway (migrations)  
+**Mobile:** Kotlin · Jetpack Compose · Retrofit  
+**Infra:** Docker  
+**Integrações:** FIPE API (Parallelum) · Groq API
 
----
+> Confira o repositorio do App: [github.com/carlosvinicyuss07/smart-car-app](https://github.com/carlosvinicyuss07/smart-car-app)
 
-## Modelagem (UML)
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/java/java-original.svg" alt="Java" height="40" /> &nbsp; <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/spring/spring-original.svg" alt="Spring" height="40" /> &nbsp; <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/mysql/mysql-original.svg" alt="MySQL" height="40" /> &nbsp;&nbsp;&nbsp; <b><font size="5" color="#444D56">❘</font></b> &nbsp;&nbsp;&nbsp; <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/kotlin/kotlin-original.svg" alt="Kotlin" height="40" /> &nbsp; <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/jetpackcompose/jetpackcompose-original.svg" alt="Jetpack Compose" height="40" /> &nbsp; <img src="https://api.iconify.design/simple-icons:square.svg?color=white" alt="Retrofit" height="34" /> &nbsp;&nbsp;&nbsp; <b><font size="5" color="#444D56">❘</font></b> &nbsp;&nbsp;&nbsp; <img src="https://cdn.simpleicons.org/docker/FFFFFF" alt="Docker" height="40" />
+
+## Diagrama de Entidade-Relacionamento (DER)
+
+
 
 ![Diagrama UML do SmartCar](assets/SmartCarUML.png)
 
@@ -124,12 +131,6 @@ O **preço justo** é calculado a partir do preço FIPE ajustado por dois fatore
 
 ## Como Executar
 
-### Pré-requisitos
-
-- Java 17+
-- MySQL rodando localmente
-- Chave da [Groq API](https://console.groq.com)
-
 ### Variáveis de ambiente
 
 | Variável | Descrição |
@@ -140,15 +141,5 @@ O **preço justo** é calculado a partir do preço FIPE ajustado por dois fatore
 | `SEU_USUARIO` | Usuário do banco MySQL |
 | `SUA_SENHA` | Senha do banco MySQL |
 
-### Rodando
 
-```bash
-# Clone o repositório
-git clone https://github.com/gusthavomnz/smart-car-api.git
-cd smart-car-api
 
-# Configure as variáveis de ambiente e execute
-./mvnw spring-boot:run
-```
-
-O Flyway aplicará as migrations automaticamente ao subir a aplicação.
