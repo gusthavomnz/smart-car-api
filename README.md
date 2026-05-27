@@ -27,7 +27,7 @@ linguagem acessível.  <h2>
 
 
 
-![Diagrama UML do SmartCar](assets/SmartCarUML.png)
+![Diagrama UML do SmartCar](assets/SmartCarER.png)
 
 ---
 
