@@ -1,5 +1,6 @@
 package com.glc.smartcar.integration.fipe.port;
 
+import com.glc.smartcar.integration.fipe.Fipe;
 import com.glc.smartcar.integration.fipe.dto.FipeNameAndCode;
 import com.glc.smartcar.integration.fipe.dto.FipeVeiculoDTO;
 
@@ -10,4 +11,5 @@ public interface FipePort {
     List<FipeNameAndCode> buscarModelos(String brandId);
     List<FipeNameAndCode> buscarAnos(String brandId, String modelId);
     FipeVeiculoDTO obterPreco(String brandId, String modelId, String yearId);
+
 }

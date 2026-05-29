@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -33,9 +34,22 @@ public class AvaliacoesService {
         this.classificacaoService = classificacaoService;
         this.iaPort = iaPort;
     }
+/*   @NotNull(message = "Marca não pode ser nula")
+    private String brandId;
+
+    @NotBlank(message = "Marca não pode ser nula")
+    private String modelId;
+
+    @NotBlank(message = "Marca não pode ser nula")
+    private String yearId;
+*/
 
     @Transactional
     public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO dto, Long usuarioId) {
+
+
+
+
 
         FipeVeiculoDTO fipeVeiculoDTO = fipePort.obterPreco(
                 dto.getBrandId(), dto.getModelId(), dto.getYearId()
