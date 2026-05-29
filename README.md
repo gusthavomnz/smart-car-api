@@ -29,6 +29,8 @@ linguagem acessível.  <h2>
 
 ![Diagrama UML do SmartCar](assets/SmartCarER.png)
 
+![Fluxo SmartCar](assets/FluxoSmartcar.excalidraw.png)
+
 ---
 
 ## Estrutura do Projeto

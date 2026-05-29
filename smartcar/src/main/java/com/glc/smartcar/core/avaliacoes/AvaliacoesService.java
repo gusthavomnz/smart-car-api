@@ -79,8 +79,8 @@ public class AvaliacoesService {
 
     private String processarAnaliseIa(String modelo, AvaliacaoRequestDTO dto, double justo, double fipe, StatusResultado status) {
         String contexto = String.format(
-                "Veículo: %s. Status: %s. Anunciado: R$%.2f. Justo: R$%.2f. Fipe: R$%.2f. KM: %.0f.",
-                modelo, status, dto.getPrecoDesejado(), justo, fipe, dto.getKmsRodados()
+                "Veículo: %s. Status: %s. Conservação: %s. Anunciado: R$%.2f. Justo: R$%.2f. Fipe: R$%.2f. KM: %.0f.",
+                modelo, status, dto.getConservacao(), dto.getPrecoDesejado(), justo, fipe, dto.getKmsRodados()
         );
 
         return iaPort.executarRequisicaoIA(iaPort.criarContexto(contexto));
