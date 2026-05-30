@@ -34,22 +34,10 @@ public class AvaliacoesService {
         this.classificacaoService = classificacaoService;
         this.iaPort = iaPort;
     }
-/*   @NotNull(message = "Marca não pode ser nula")
-    private String brandId;
 
-    @NotBlank(message = "Marca não pode ser nula")
-    private String modelId;
-
-    @NotBlank(message = "Marca não pode ser nula")
-    private String yearId;
-*/
 
     @Transactional
     public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO dto, Long usuarioId) {
-
-
-
-
 
         FipeVeiculoDTO fipeVeiculoDTO = fipePort.obterPreco(
                 dto.getBrandId(), dto.getModelId(), dto.getYearId()
@@ -69,10 +57,9 @@ public class AvaliacoesService {
                 dto.getPrecoDesejado(), precoJusto
         );
 
-        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipeVeiculoDTO.CodigoFipe(), status);
-        Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
-
         String mensagemFinal = processarAnaliseIa(fipeVeiculoDTO.Modelo(), dto, precoJusto, precoFipe, status);
+        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipeVeiculoDTO.CodigoFipe(), status, mensagemFinal);
+        Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
 
         return avaliacoesMapper.toDTO(salvo, mensagemFinal);
     }

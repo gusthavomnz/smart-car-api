@@ -15,7 +15,7 @@ public class AvaliacoesMapper {
 
 
 
-    public Avaliacoes toEntity(AvaliacaoRequestDTO dto, Long usuarioId, double precoFipe, String codigoFipe, StatusResultado status) {
+    public Avaliacoes toEntity(AvaliacaoRequestDTO dto, Long usuarioId, double precoFipe, String codigoFipe, StatusResultado status, String msgIA) {
         Avaliacoes entity = new Avaliacoes();
 
         entity.setUsuarioId(usuarioId);
@@ -30,6 +30,7 @@ public class AvaliacoesMapper {
 
         entity.setHistoricoAtivo(HistoricoAtivo.SIM);
         entity.setCriado_a(LocalDateTime.now());
+        entity.setAvaliacaoIa(msgIA);
 
         return entity;
     }
@@ -50,7 +51,8 @@ public class AvaliacoesMapper {
                 entity.getCriado_a(),
                 entity.getConservacao(),
                 entity.getHistoricoAtivo(),
-                entity.getNotasPessoais());
+                entity.getNotasPessoais(),
+        entity.getAvaliacaoIa());
     }
 
     public AvaliacaoResponseDTO toDTO(Avaliacoes entity, String avaliacaoIA) {
