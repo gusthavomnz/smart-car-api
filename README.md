@@ -29,7 +29,9 @@ linguagem acessível.  <h2>
 
 ![Diagrama UML do SmartCar](assets/SmartCarER.png)
 
-Fluxograma principal do Projeto: 
+SmartCar foi desenvolvido como POC (Prova de Conceito) para a disciplina de Projeto Integrador I.
+O fluxograma abaixo representa o fluxo principal do sistema: do recebimento dos dados do veículo até a entrega da avaliação ao usuário. Ele cobre os principais caminhos de decisão — incluindo consulta ao banco de dados, integração com a API da FIPE, cálculo de avaliação e geração da resposta via IA (Groq).
+Cada ramificação foi pensada para refletir o comportamento real do sistema, incluindo cenários de cache, dados desatualizados e fallbacks.
 
 ![Fluxo SmartCar](assets/FluxoSmartcar.excalidraw.png)
 
