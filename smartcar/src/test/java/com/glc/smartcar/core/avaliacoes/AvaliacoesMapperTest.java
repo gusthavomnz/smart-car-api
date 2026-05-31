@@ -57,7 +57,7 @@ class AvaliacoesMapperTest {
     void deveConverterDtoParaEntidadeCorretamente() {
         AvaliacaoRequestDTO dto = criarDtoDeRequisicao();
 
-        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, "001234-5", StatusResultado.OTIMO_NEGOCIO);
+        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, "001234-5", StatusResultado.OTIMO_NEGOCIO, "análise ia");
 
         assertEquals(1L, entidade.getUsuarioId());
         assertEquals(50000.0, entidade.getKmsRodados());
@@ -72,7 +72,7 @@ class AvaliacoesMapperTest {
     void toEntityDeveDefinirHistoricoAtivoComoSim() {
         AvaliacaoRequestDTO dto = criarDtoDeRequisicao();
 
-        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, "001234-5", StatusResultado.NA_MEDIA);
+        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, "001234-5", StatusResultado.NA_MEDIA, "análise ia");
 
         assertEquals(HistoricoAtivo.SIM, entidade.getHistoricoAtivo());
     }
@@ -81,7 +81,7 @@ class AvaliacoesMapperTest {
     void toEntityDevePreencherDataDeCriacao() {
         AvaliacaoRequestDTO dto = criarDtoDeRequisicao();
 
-        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, "001234-5", StatusResultado.NA_MEDIA);
+        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, "001234-5", StatusResultado.NA_MEDIA, "análise ia");
 
         assertNotNull(entidade.getCriado_a());
     }
