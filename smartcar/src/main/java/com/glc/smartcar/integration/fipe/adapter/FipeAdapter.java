@@ -1,19 +1,31 @@
 package com.glc.smartcar.integration.fipe.adapter;
 
+import com.glc.smartcar.integration.fipe.Fipe;
+import com.glc.smartcar.integration.fipe.FipeRepository;
 import com.glc.smartcar.integration.fipe.dto.FipeNameAndCode;
 import com.glc.smartcar.integration.fipe.dto.FipeVeiculoDTO;
 import com.glc.smartcar.integration.fipe.port.FipePort;
 import org.springframework.stereotype.Component;
 
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class FipeAdapter implements FipePort {
 
-    private final FipeClient fipeClient;
+    private static final DateTimeFormatter FIPE_MES_FORMATTER =
+            DateTimeFormatter.ofPattern("MMMM yyyy", new Locale("pt", "BR"));
 
-    public FipeAdapter(FipeClient fipeClient) {
+    private final FipeClient fipeClient;
+    private final FipeRepository fipeRepository;
+    private final FipeMapper fipeMapper;
+
+    public FipeAdapter(FipeClient fipeClient, FipeRepository fipeRepository, FipeMapper fipeMapper) {
         this.fipeClient = fipeClient;
+        this.fipeRepository = fipeRepository;
+        this.fipeMapper = fipeMapper;
     }
 
     @Override
@@ -33,6 +45,33 @@ public class FipeAdapter implements FipePort {
 
     @Override
     public FipeVeiculoDTO obterPreco(String brandId, String modelId, String yearId) {
-        return fipeClient.obterPreco(brandId, modelId, yearId);
+        Fipe fipeCache = fipeRepository.findByCodigoMarcaAndCodigoModeloAndCodigoAno(brandId, modelId, yearId)
+                .orElse(null);
+
+        if (fipeCache != null && verificarDataCache(fipeCache)) {
+            System.out.println("PEGUEI DO BANCO!");
+            return fipeMapper.toDTO(fipeCache);
+        }
+
+        FipeVeiculoDTO dto = fipeClient.obterPreco(brandId, modelId, yearId);
+
+        if (fipeCache == null || !dto.MesReferencia().equalsIgnoreCase(fipeCache.getReferenciaMes())) {
+            Fipe fipeAtualizado = fipeMapper.toEntity(dto, brandId, modelId, yearId, fipeCache);
+            fipeRepository.save(fipeAtualizado);
+        }
+
+        return dto;
+    }
+
+    public boolean verificarDataCache(Fipe fipeCache) {
+        if (fipeCache.getReferenciaMes() == null) {
+            return false;
+        }
+        try {
+            YearMonth mesAnoCache = YearMonth.parse(fipeCache.getReferenciaMes().toLowerCase(), FIPE_MES_FORMATTER);
+            return mesAnoCache.equals(YearMonth.now());
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

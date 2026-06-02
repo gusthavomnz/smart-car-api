@@ -1,5 +1,6 @@
 package com.glc.smartcar.integration.fipe.adapter;
 
+import com.glc.smartcar.integration.fipe.FipeRepository;
 import com.glc.smartcar.integration.fipe.dto.FipeNameAndCode;
 import com.glc.smartcar.integration.fipe.dto.FipeVeiculoDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,12 +21,16 @@ class FipeAdapterTest {
 
     @Mock
     FipeClient clienteFipe;
+    @Mock
+    FipeRepository repositorioFipe;
+    @Mock
+    FipeMapper mapeadorFipe;
 
     FipeAdapter adaptadorFipe;
 
     @BeforeEach
     void configurar() {
-        adaptadorFipe = new FipeAdapter(clienteFipe);
+        adaptadorFipe = new FipeAdapter(clienteFipe, repositorioFipe, mapeadorFipe);
     }
 
 

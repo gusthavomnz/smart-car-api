@@ -1,0 +1,4 @@
+ALTER TABLE fipe
+ADD COLUMN codigo_marca  VARCHAR(20) NOT NULL,
+ADD COLUMN codigo_modelo VARCHAR(20) NOT NULL,
+ADD COLUMN codigo_ano    VARCHAR(20) NOT NULL;

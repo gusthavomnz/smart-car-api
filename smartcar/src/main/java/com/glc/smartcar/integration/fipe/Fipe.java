@@ -27,5 +27,26 @@ public class Fipe {
         @Column(name = "codigo_fipe", unique = true)
         private String codigoFipe;
 
+        @Column(name = "codigo_marca", nullable = false)
+        private String codigoMarca;
+
+        @Column(name = "codigo_modelo", nullable = false)
+        private String codigoModelo;
+
+        @Column(name = "codigo_ano", nullable = false)
+        private String codigoAno;
+
+        @Column(name = "preco", precision = 10, scale = 2)
+        private java.math.BigDecimal preco;
+
+        @Column(name = "combustivel", length = 30)
+        private String combustivel;
+
+        @Column(name = "referencia_mes", length = 30)
+        private String referenciaMes;
+
+        @Column(name = "atualizado_a")
+        private java.time.LocalDateTime atualizadoA;
+
 }
 

@@ -52,5 +52,7 @@ public class Avaliacoes {
     @Column(name = "notas_pessoais")
     private String notasPessoais;
 
+    @Column(name = "avaliacao_ia", columnDefinition = "TEXT")
+    private String avaliacaoIa;
 
 }

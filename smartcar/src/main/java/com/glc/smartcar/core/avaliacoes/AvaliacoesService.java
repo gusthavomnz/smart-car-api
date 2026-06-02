@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -33,6 +34,7 @@ public class AvaliacoesService {
         this.classificacaoService = classificacaoService;
         this.iaPort = iaPort;
     }
+
 
     @Transactional
     public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoRequestDTO dto, Long usuarioId) {
@@ -55,18 +57,17 @@ public class AvaliacoesService {
                 dto.getPrecoDesejado(), precoJusto
         );
 
-        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipeVeiculoDTO.CodigoFipe(), status);
-        Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
-
         String mensagemFinal = processarAnaliseIa(fipeVeiculoDTO.Modelo(), dto, precoJusto, precoFipe, status);
+        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipeVeiculoDTO.CodigoFipe(), status, mensagemFinal);
+        Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
 
         return avaliacoesMapper.toDTO(salvo, mensagemFinal);
     }
 
     private String processarAnaliseIa(String modelo, AvaliacaoRequestDTO dto, double justo, double fipe, StatusResultado status) {
         String contexto = String.format(
-                "Veículo: %s. Status: %s. Anunciado: R$%.2f. Justo: R$%.2f. Fipe: R$%.2f. KM: %.0f.",
-                modelo, status, dto.getPrecoDesejado(), justo, fipe, dto.getKmsRodados()
+                "Veículo: %s. Status: %s. Conservação: %s. Anunciado: R$%.2f. Justo: R$%.2f. Fipe: R$%.2f. KM: %.0f.",
+                modelo, status, dto.getConservacao(), dto.getPrecoDesejado(), justo, fipe, dto.getKmsRodados()
         );
 
         return iaPort.executarRequisicaoIA(iaPort.criarContexto(contexto));
