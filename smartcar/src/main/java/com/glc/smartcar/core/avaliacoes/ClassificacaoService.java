@@ -103,7 +103,7 @@ carro impecável → até +20%
         if (indice <= 0.90) return StatusResultado.OTIMO_NEGOCIO;
         if (indice <= 1.05) return StatusResultado.NA_MEDIA;
         if (indice <= 1.20) return StatusResultado.ACIMA_DA_MEDIA;
-        return StatusResultado.DIFICIL_DE_VENDER;
+        return StatusResultado.PESSIMO_NEGOCIO;
     }
 
 }

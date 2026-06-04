@@ -157,7 +157,7 @@
   │                        "OTIMO_NEGOCIO"     →  ótima compra        │
   │                        "NA_MEDIA"          →  preço justo         │
   │                        "ACIMA_DA_MEDIA"    →  acima do mercado    │
-  │                        "DIFICIL_DE_VENDER" →  preço muito alto    │
+  │                        "PESSIMO_NEGOCIO"   →  preço muito alto    │
   │   "criado_a":        LocalDateTime  ex: "2026-05-19T10:45:00"    │
   │   "conservacao":     String/Enum    ("NOVO"|"BOM"|"REGULAR"|"RUIM")│
   │   "historicoAtivo":  String/Enum    ("SIM"|"NAO")                 │
@@ -442,7 +442,7 @@
   │  "OTIMO_NEGOCIO"     →  ótimo negócio, preço abaixo do justo│
   │  "NA_MEDIA"          →  preço dentro da média de mercado    │
   │  "ACIMA_DA_MEDIA"    →  preço acima da média de mercado     │
-  │  "DIFICIL_DE_VENDER" →  preço muito acima, difícil de vender│
+  │  "PESSIMO_NEGOCIO"   →  preço muito acima, difícil de vender│
   └──────────────────────────────────────────────────────────────┘
 
   historicoAtivo  (retornado nas respostas)

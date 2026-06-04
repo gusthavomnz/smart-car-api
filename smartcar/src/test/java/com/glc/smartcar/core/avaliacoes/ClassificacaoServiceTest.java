@@ -150,9 +150,9 @@ class ClassificacaoServiceTest {
     }
 
     @Test
-    void deveClassificarComoDificilDeVenderQuandoPrecoMuitoAcima() {
-        // ratio = 1.30 → DIFICIL_DE_VENDER
-        assertEquals(StatusResultado.DIFICIL_DE_VENDER,
+    void deveClassificarComoPessimoNegocioQuandoPrecoMuitoAcima() {
+        // ratio = 1.30 → PESSIMO_NEGOCIO
+        assertEquals(StatusResultado.PESSIMO_NEGOCIO,
                 classificacaoService.classificarNegocio(130000.0, 100000.0));
     }
 
