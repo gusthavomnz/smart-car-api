@@ -55,4 +55,7 @@ public class Avaliacoes {
     @Column(name = "avaliacao_ia", columnDefinition = "TEXT")
     private String avaliacaoIa;
 
+    @Column(name = "variacao")
+    private Double variacao;
+
 }

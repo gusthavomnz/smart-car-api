@@ -15,7 +15,7 @@ public class AvaliacoesMapper {
 
 
 
-    public Avaliacoes toEntity(AvaliacaoRequestDTO dto, Long usuarioId, double precoFipe, String codigoFipe, StatusResultado status, String msgIA) {
+    public Avaliacoes toEntity(AvaliacaoRequestDTO dto, Long usuarioId, double precoFipe, String codigoFipe, StatusResultado status, String msgIA, double variacao) {
         Avaliacoes entity = new Avaliacoes();
 
         entity.setUsuarioId(usuarioId);
@@ -31,17 +31,16 @@ public class AvaliacoesMapper {
         entity.setHistoricoAtivo(HistoricoAtivo.SIM);
         entity.setCriado_a(LocalDateTime.now());
         entity.setAvaliacaoIa(msgIA);
+        entity.setVariacao(variacao);
 
         return entity;
     }
-
-
 
     public AvaliacaoResponseDTO toDTO(Avaliacoes entity){
         if (entity == null) {
             return null;
         }
-        return new AvaliacaoResponseDTO(
+        AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(
                 entity.getId(),
                 entity.getUsuarioId(),
                 entity.getFipeId(),
@@ -52,14 +51,16 @@ public class AvaliacoesMapper {
                 entity.getConservacao(),
                 entity.getHistoricoAtivo(),
                 entity.getNotasPessoais(),
-        entity.getAvaliacaoIa());
+                entity.getAvaliacaoIa());
+        dto.setVariacao(entity.getVariacao());
+        return dto;
     }
 
     public AvaliacaoResponseDTO toDTO(Avaliacoes entity, String avaliacaoIA) {
         if (entity == null) {
             return null;
         }
-        return new AvaliacaoResponseDTO(
+        AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(
                 entity.getId(),
                 entity.getUsuarioId(),
                 entity.getFipeId(),
@@ -71,6 +72,8 @@ public class AvaliacoesMapper {
                 entity.getHistoricoAtivo(),
                 entity.getNotasPessoais(),
                 avaliacaoIA);
+        dto.setVariacao(entity.getVariacao());
+        return dto;
     }
 
     public List<AvaliacaoResponseDTO> toDTOList(List<Avaliacoes> entities) {

@@ -131,7 +131,7 @@ O **preço justo** é calculado a partir do preço FIPE ajustado por dois fatore
 | `OTIMO_NEGOCIO` | Preço anunciado ≤ 90% do preço justo |
 | `NA_MEDIA` | 90% — 105% |
 | `ACIMA_DA_MEDIA` | 105% — 120% |
-| `DIFICIL_DE_VENDER` | > 120% |
+| `PESSIMO_NEGOCIO` | > 120% |
 
 ---
 

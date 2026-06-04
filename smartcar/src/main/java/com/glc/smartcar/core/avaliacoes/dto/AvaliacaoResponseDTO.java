@@ -21,6 +21,7 @@ public class AvaliacaoResponseDTO {
     private HistoricoAtivo historicoAtivo;
     private String notasPessoais;
     private String avaliacaoIA;
+    private Double variacao;
 
     public AvaliacaoResponseDTO() {
     }

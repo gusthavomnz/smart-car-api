@@ -157,13 +157,17 @@
   │                        "OTIMO_NEGOCIO"     →  ótima compra        │
   │                        "NA_MEDIA"          →  preço justo         │
   │                        "ACIMA_DA_MEDIA"    →  acima do mercado    │
-  │                        "DIFICIL_DE_VENDER" →  preço muito alto    │
+  │                        "PESSIMO_NEGOCIO"   →  preço muito alto    │
   │   "criado_a":        LocalDateTime  ex: "2026-05-19T10:45:00"    │
   │   "conservacao":     String/Enum    ("NOVO"|"BOM"|"REGULAR"|"RUIM")│
   │   "historicoAtivo":  String/Enum    ("SIM"|"NAO")                 │
   │   "notasPessoais":   String                                       │
   │   "avaliacaoIA":     String         (análise gerada por IA;       │
   │                                      pode ser null)              │
+  │   "variacao":        Double         (variação % entre preço      │
+  │                                      desejado e FIPE;            │
+  │                                      positivo = acima do FIPE,   │
+  │                                      negativo = abaixo do FIPE)  │
   │ }                                                                  │
   └────────────────────────────────────────────────────────────────────┘
 
@@ -194,7 +198,8 @@
       "conservacao":     "BOM",
       "historicoAtivo":  "SIM",
       "notasPessoais":   "Carro bem cuidado, revisões em dia",
-      "avaliacaoIA":     "Excelente negócio! O veículo está sendo anunciado..."
+      "avaliacaoIA":     "Excelente negócio! O veículo está sendo anunciado...",
+      "variacao":        -7.22
     }
 
 
@@ -222,6 +227,7 @@
   │     "historicoAtivo":  String/Enum                                 │
   │     "notasPessoais":   String                                      │
   │     "avaliacaoIA":     String  (pode ser null)                     │
+  │     "variacao":        Double  (% entre precoDesejado e precoFipe) │
   │   },                                                               │
   │   ...                                                              │
   │ ]                                                                  │
@@ -259,6 +265,7 @@
   │   "historicoAtivo":  "NAO"    ← sempre NAO após desativar         │
   │   "notasPessoais":   String                                        │
   │   "avaliacaoIA":     String  (pode ser null)                       │
+  │   "variacao":        Double  (% entre precoDesejado e precoFipe)   │
   │ }                                                                  │
   └────────────────────────────────────────────────────────────────────┘
 
@@ -435,7 +442,7 @@
   │  "OTIMO_NEGOCIO"     →  ótimo negócio, preço abaixo do justo│
   │  "NA_MEDIA"          →  preço dentro da média de mercado    │
   │  "ACIMA_DA_MEDIA"    →  preço acima da média de mercado     │
-  │  "DIFICIL_DE_VENDER" →  preço muito acima, difícil de vender│
+  │  "PESSIMO_NEGOCIO"   →  preço muito acima, difícil de vender│
   └──────────────────────────────────────────────────────────────┘
 
   historicoAtivo  (retornado nas respostas)
