@@ -164,6 +164,10 @@
   │   "notasPessoais":   String                                       │
   │   "avaliacaoIA":     String         (análise gerada por IA;       │
   │                                      pode ser null)              │
+  │   "variacao":        Double         (variação % entre preço      │
+  │                                      desejado e FIPE;            │
+  │                                      positivo = acima do FIPE,   │
+  │                                      negativo = abaixo do FIPE)  │
   │ }                                                                  │
   └────────────────────────────────────────────────────────────────────┘
 
@@ -194,7 +198,8 @@
       "conservacao":     "BOM",
       "historicoAtivo":  "SIM",
       "notasPessoais":   "Carro bem cuidado, revisões em dia",
-      "avaliacaoIA":     "Excelente negócio! O veículo está sendo anunciado..."
+      "avaliacaoIA":     "Excelente negócio! O veículo está sendo anunciado...",
+      "variacao":        -7.22
     }
 
 
@@ -222,6 +227,7 @@
   │     "historicoAtivo":  String/Enum                                 │
   │     "notasPessoais":   String                                      │
   │     "avaliacaoIA":     String  (pode ser null)                     │
+  │     "variacao":        Double  (% entre precoDesejado e precoFipe) │
   │   },                                                               │
   │   ...                                                              │
   │ ]                                                                  │
@@ -259,6 +265,7 @@
   │   "historicoAtivo":  "NAO"    ← sempre NAO após desativar         │
   │   "notasPessoais":   String                                        │
   │   "avaliacaoIA":     String  (pode ser null)                       │
+  │   "variacao":        Double  (% entre precoDesejado e precoFipe)   │
   │ }                                                                  │
   └────────────────────────────────────────────────────────────────────┘
 

@@ -58,10 +58,16 @@ public class AvaliacoesService {
         );
 
         String mensagemFinal = processarAnaliseIa(fipeVeiculoDTO.Modelo(), dto, precoJusto, precoFipe, status);
-        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipeVeiculoDTO.CodigoFipe(), status, mensagemFinal);
+        double variacao = calcularVariacao(dto.getPrecoDesejado(), precoFipe);
+        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipeVeiculoDTO.CodigoFipe(), status, mensagemFinal, variacao);
         Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
 
         return avaliacoesMapper.toDTO(salvo, mensagemFinal);
+    }
+
+    private double calcularVariacao(double precoDesejado, double precoFipe) {
+        double variacao = ((precoDesejado - precoFipe) / precoFipe) * 100;
+        return Math.round(variacao * 100.0) / 100.0;
     }
 
     private String processarAnaliseIa(String modelo, AvaliacaoRequestDTO dto, double justo, double fipe, StatusResultado status) {
