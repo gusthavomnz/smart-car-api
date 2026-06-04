@@ -4,6 +4,8 @@ import com.glc.smartcar.core.avaliacoes.dto.AvaliacaoRequestDTO;
 import com.glc.smartcar.core.avaliacoes.dto.AvaliacaoResponseDTO;
 import com.glc.smartcar.core.avaliacoes.enums.HistoricoAtivo;
 import com.glc.smartcar.core.avaliacoes.enums.StatusResultado;
+import com.glc.smartcar.integration.fipe.Fipe;
+import com.glc.smartcar.integration.fipe.FipeRepository;
 import com.glc.smartcar.integration.fipe.dto.FipeVeiculoDTO;
 import com.glc.smartcar.integration.fipe.port.FipePort;
 import com.glc.smartcar.integration.ia.port.IaPort;
@@ -14,21 +16,21 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
-
 public class AvaliacoesService {
 
     private final FipePort fipePort;
+    private final FipeRepository fipeRepository;
     private final AvaliacoesRepository avaliacoesRepository;
     private final AvaliacoesMapper avaliacoesMapper;
     private final ClassificacaoService classificacaoService;
     private final IaPort iaPort;
 
-    public AvaliacoesService(FipePort fipePort, AvaliacoesRepository avaliacoesRepository, AvaliacoesMapper avaliacoesMapper, ClassificacaoService classificacaoService, IaPort iaPort) {
+    public AvaliacoesService(FipePort fipePort, FipeRepository fipeRepository, AvaliacoesRepository avaliacoesRepository, AvaliacoesMapper avaliacoesMapper, ClassificacaoService classificacaoService, IaPort iaPort) {
         this.fipePort = fipePort;
+        this.fipeRepository = fipeRepository;
         this.avaliacoesRepository = avaliacoesRepository;
         this.avaliacoesMapper = avaliacoesMapper;
         this.classificacaoService = classificacaoService;
@@ -62,7 +64,8 @@ public class AvaliacoesService {
         Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipeVeiculoDTO.CodigoFipe(), status, mensagemFinal, variacao);
         Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
 
-        return avaliacoesMapper.toDTO(salvo, mensagemFinal);
+        Fipe fipe = fipeRepository.findByCodigoFipe(salvo.getFipeId()).orElse(null);
+        return avaliacoesMapper.toDTO(salvo, fipe);
     }
 
     private double calcularVariacao(double precoDesejado, double precoFipe) {
@@ -80,7 +83,6 @@ public class AvaliacoesService {
     }
 
 
-
     @Transactional
     public AvaliacaoResponseDTO excluirAvaliacao(Long id, Long usuarioId) {
         Avaliacoes a = avaliacoesRepository.findById(id)
@@ -91,7 +93,8 @@ public class AvaliacoesService {
         }
 
         a.setHistoricoAtivo(HistoricoAtivo.NAO);
-        return avaliacoesMapper.toDTO(avaliacoesRepository.save(a));
+        Fipe fipe = fipeRepository.findByCodigoFipe(a.getFipeId()).orElse(null);
+        return avaliacoesMapper.toDTO(avaliacoesRepository.save(a), fipe);
     }
 
 
@@ -99,7 +102,8 @@ public class AvaliacoesService {
         List<Avaliacoes> listaEntities = avaliacoesRepository
                 .findAllByUsuarioIdAndHistoricoAtivo(usuarioId, HistoricoAtivo.SIM);
 
-        return avaliacoesMapper.toDTOList(listaEntities);
+        return avaliacoesMapper.toDTOList(listaEntities,
+                codigoFipe -> fipeRepository.findByCodigoFipe(codigoFipe).orElse(null));
     }
 
 }

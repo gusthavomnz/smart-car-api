@@ -1,19 +1,19 @@
 package com.glc.smartcar.core.avaliacoes;
 
-
 import com.glc.smartcar.core.avaliacoes.dto.AvaliacaoRequestDTO;
 import com.glc.smartcar.core.avaliacoes.dto.AvaliacaoResponseDTO;
+import com.glc.smartcar.core.avaliacoes.dto.VeiculoDTO;
 import com.glc.smartcar.core.avaliacoes.enums.HistoricoAtivo;
 import com.glc.smartcar.core.avaliacoes.enums.StatusResultado;
+import com.glc.smartcar.integration.fipe.Fipe;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Function;
 
 @Component
 public class AvaliacoesMapper {
-
-
 
     public Avaliacoes toEntity(AvaliacaoRequestDTO dto, Long usuarioId, double precoFipe, String codigoFipe, StatusResultado status, String msgIA, double variacao) {
         Avaliacoes entity = new Avaliacoes();
@@ -36,49 +36,31 @@ public class AvaliacoesMapper {
         return entity;
     }
 
-    public AvaliacaoResponseDTO toDTO(Avaliacoes entity){
-        if (entity == null) {
-            return null;
-        }
-        AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(
+    public AvaliacaoResponseDTO toDTO(Avaliacoes entity, Fipe fipe) {
+        VeiculoDTO veiculo = fipe != null
+                ? new VeiculoDTO(fipe.getMarca(), fipe.getModelo(), fipe.getAno(), fipe.getCombustivel())
+                : null;
+
+        return new AvaliacaoResponseDTO(
                 entity.getId(),
-                entity.getUsuarioId(),
                 entity.getFipeId(),
+                veiculo,
                 entity.getPrecoDesejado(),
                 entity.getPrecoFipe(),
+                entity.getVariacao(),
                 entity.getStatusResultado(),
-                entity.getCriado_a(),
                 entity.getConservacao(),
-                entity.getHistoricoAtivo(),
+                entity.getKmsRodados(),
                 entity.getNotasPessoais(),
-                entity.getAvaliacaoIa());
-        dto.setVariacao(entity.getVariacao());
-        return dto;
+                entity.getAvaliacaoIa(),
+                entity.getCriado_a(),
+                entity.getHistoricoAtivo()
+        );
     }
 
-    public AvaliacaoResponseDTO toDTO(Avaliacoes entity, String avaliacaoIA) {
-        if (entity == null) {
-            return null;
-        }
-        AvaliacaoResponseDTO dto = new AvaliacaoResponseDTO(
-                entity.getId(),
-                entity.getUsuarioId(),
-                entity.getFipeId(),
-                entity.getPrecoDesejado(),
-                entity.getPrecoFipe(),
-                entity.getStatusResultado(),
-                entity.getCriado_a(),
-                entity.getConservacao(),
-                entity.getHistoricoAtivo(),
-                entity.getNotasPessoais(),
-                avaliacaoIA);
-        dto.setVariacao(entity.getVariacao());
-        return dto;
-    }
-
-    public List<AvaliacaoResponseDTO> toDTOList(List<Avaliacoes> entities) {
+    public List<AvaliacaoResponseDTO> toDTOList(List<Avaliacoes> entities, Function<String, Fipe> buscaFipePorCodigo) {
         return entities.stream()
-                .map(this::toDTO)
+                .map(e -> toDTO(e, buscaFipePorCodigo.apply(e.getFipeId())))
                 .toList();
     }
 }

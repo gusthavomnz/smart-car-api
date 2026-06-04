@@ -15,5 +15,6 @@ public interface FipeRepository extends JpaRepository<Fipe,Long> {
             String codigoAno
     );
 
+    Optional<Fipe> findByCodigoFipe(String codigoFipe);
 
 }
