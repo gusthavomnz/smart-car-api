@@ -15,7 +15,7 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   Rotas públicas (sem token)     POST /auth/cadastrar  |  POST /auth/login
-  Rotas protegidas (token req.)  tudo em /sc/**  e  /fipe/**
+  Rotas protegidas (token req.)  tudo em /sc/**,  /fipe/**  e  /usuario/**
 
   O token é obtido via POST /auth/login e deve ser enviado em todas as rotas
   protegidas no header:
@@ -208,6 +208,26 @@
 
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
+│  GET /sc/{id}                                                      200 OK   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  Retorna uma avaliação específica do usuário autenticado pelo seu ID.
+  Apenas o dono da avaliação pode consultá-la.
+
+  Path variable
+  ─────────────
+  id   Long   ID da avaliação a consultar
+
+  Response  200   →  AvaliacaoResponse  (ver objeto acima)
+
+  Erros
+  ─────
+  401  token ausente, expirado ou inválido
+  403  avaliação pertence a outro usuário
+  404  avaliação com o ID informado não existe
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
 │  PATCH /sc/{id}                                                    200 OK   │
 └─────────────────────────────────────────────────────────────────────────────┘
 
@@ -225,6 +245,70 @@
   401  token ausente, expirado ou inválido
   403  avaliação pertence a outro usuário
   404  avaliação com o ID informado não existe
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ROTAS DE PERFIL  (/usuario)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Todas as rotas /usuario exigem token. O usuário é identificado pelo token —
+  nunca incluir usuarioId no body.
+
+  Objeto UsuarioPerfilResponse  (retornado por GET /usuario/perfil)
+  ─────────────────────────────────────────────────────────────────────────────
+  Campo      Tipo           Nulável  Descrição
+  id         Long           não      Identificador do usuário
+  nome       String         não      Nome completo
+  email      String         não      E-mail cadastrado
+  criado_a   LocalDateTime  não      Data/hora de criação da conta
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  GET /usuario/perfil                                               200 OK   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  Retorna os dados do perfil do usuário autenticado.
+
+  Response  200   →  UsuarioPerfilResponse  (ver objeto acima)
+
+  Erros
+  ─────
+  401  token ausente, expirado ou inválido
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PUT /usuario/senha                                              204 No Content │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  Altera a senha do usuário autenticado. A senha atual é validada antes
+  de aplicar a troca. A nova senha deve ter no mínimo 6 caracteres.
+
+  Request
+  ───────
+  Campo       Tipo    Obrig.  Regra
+  senhaAtual  String  sim     não vazia — deve coincidir com a senha atual
+  novaSenha   String  sim     não vazia, mínimo 6 caracteres
+
+  Response  204   →  sem corpo
+
+  Erros
+  ─────
+  400  campo ausente, senha atual incorreta ou nova senha com menos de 6 caracteres
+  401  token ausente, expirado ou inválido
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  DELETE /usuario                                                 204 No Content │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  Exclui permanentemente a conta do usuário autenticado e todas as suas
+  avaliações. A operação é irreversível.
+
+  Response  204   →  sem corpo
+
+  Erros
+  ─────
+  401  token ausente, expirado ou inválido
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -323,12 +407,16 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   Método  Rota                                                   Auth   Retorno  Erros
-  ──────  ─────────────────────────────────────────────────────  ─────  ───────  ──────────
+  ──────  ─────────────────────────────────────────────────────  ─────  ───────  ──────────────
   POST    /auth/cadastrar                                         não    201      400, 409
   POST    /auth/login                                             não    200      400, 401
   POST    /sc                                                     sim    200      400, 401
   GET     /sc                                                     sim    200      401
+  GET     /sc/{id}                                                sim    200      401, 403, 404
   PATCH   /sc/{id}                                                sim    200      401, 403, 404
+  GET     /usuario/perfil                                         sim    200      401
+  PUT     /usuario/senha                                          sim    204      400, 401
+  DELETE  /usuario                                                sim    204      401
   GET     /fipe                                                   sim    200      401
   GET     /fipe/marcas/{brandId}/modelos                          sim    200      401
   GET     /fipe/marcas/{brandId}/modelos/{modelId}/anos           sim    200      401

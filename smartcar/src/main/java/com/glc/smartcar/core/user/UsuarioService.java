@@ -13,7 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 @Service
-public class UsuarioService {
+public class git UsuarioService {
 
     private final UserRepository userRepository;
     private final UsuarioMapper usuarioMapper;
