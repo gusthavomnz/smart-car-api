@@ -106,4 +106,16 @@ public class AvaliacoesService {
                 codigoFipe -> fipeRepository.findByCodigoFipe(codigoFipe).orElse(null));
     }
 
+    public AvaliacaoResponseDTO buscarAvaliacaoPorId(Long id, Long usuarioId) {
+        Avaliacoes avaliacao = avaliacoesRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Avaliação não encontrada"));
+
+        if (!avaliacao.getUsuarioId().equals(usuarioId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar esta avaliação");
+        }
+
+        Fipe fipe = fipeRepository.findByCodigoFipe(avaliacao.getFipeId()).orElse(null);
+        return avaliacoesMapper.toDTO(avaliacao, fipe);
+    }
+
 }

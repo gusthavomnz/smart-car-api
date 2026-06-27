@@ -2,6 +2,7 @@ package com.glc.smartcar.core.user;
 
 import com.glc.smartcar.core.auth.dto.AuthRegisterRequest;
 import com.glc.smartcar.core.auth.dto.AuthRegisterResponse;
+import com.glc.smartcar.core.user.dto.UsuarioPerfilResponse;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -26,4 +27,14 @@ public class UsuarioMapper {
                 usuario.getCriado_a()
         );
     }
+
+    public UsuarioPerfilResponse toPerfilDTO(Usuario usuario) {
+        return new UsuarioPerfilResponse(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getCriado_a()
+        );
+    }
 }
+
