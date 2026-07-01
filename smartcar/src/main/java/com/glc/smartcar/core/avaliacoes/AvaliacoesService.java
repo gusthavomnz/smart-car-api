@@ -61,11 +61,14 @@ public class AvaliacoesService {
 
         String mensagemFinal = processarAnaliseIa(fipeVeiculoDTO.Modelo(), dto, precoJusto, precoFipe, status);
         double variacao = calcularVariacao(dto.getPrecoDesejado(), precoFipe);
-        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipeVeiculoDTO.CodigoFipe(), status, mensagemFinal, variacao);
+        Fipe fipe = fipeRepository.findByCodigoMarcaAndCodigoModeloAndCodigoAno(
+                dto.getBrandId(), dto.getModelId(), dto.getYearId()
+        ).orElseThrow(() -> new EntityNotFoundException("Fipe não encontrada no cache após consulta"));
+
+        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipe, status, mensagemFinal, variacao);
         Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
 
-        Fipe fipe = fipeRepository.findByCodigoFipe(salvo.getFipeId()).orElse(null);
-        return avaliacoesMapper.toDTO(salvo, fipe);
+        return avaliacoesMapper.toDTO(salvo);
     }
 
     private double calcularVariacao(double precoDesejado, double precoFipe) {
@@ -93,8 +96,7 @@ public class AvaliacoesService {
         }
 
         a.setHistoricoAtivo(HistoricoAtivo.NAO);
-        Fipe fipe = fipeRepository.findByCodigoFipe(a.getFipeId()).orElse(null);
-        return avaliacoesMapper.toDTO(avaliacoesRepository.save(a), fipe);
+        return avaliacoesMapper.toDTO(avaliacoesRepository.save(a));
     }
 
 
@@ -102,8 +104,7 @@ public class AvaliacoesService {
         List<Avaliacoes> listaEntities = avaliacoesRepository
                 .findAllByUsuarioIdAndHistoricoAtivo(usuarioId, HistoricoAtivo.SIM);
 
-        return avaliacoesMapper.toDTOList(listaEntities,
-                codigoFipe -> fipeRepository.findByCodigoFipe(codigoFipe).orElse(null));
+        return avaliacoesMapper.toDTOList(listaEntities);
     }
 
     public AvaliacaoResponseDTO buscarAvaliacaoPorId(Long id, Long usuarioId) {
@@ -114,8 +115,7 @@ public class AvaliacoesService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar esta avaliação");
         }
 
-        Fipe fipe = fipeRepository.findByCodigoFipe(avaliacao.getFipeId()).orElse(null);
-        return avaliacoesMapper.toDTO(avaliacao, fipe);
+        return avaliacoesMapper.toDTO(avaliacao);
     }
 
 }

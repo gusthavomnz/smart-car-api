@@ -56,6 +56,13 @@ public class FipeAdapter implements FipePort {
         FipeVeiculoDTO dto = fipeClient.obterPreco(brandId, modelId, yearId);
 
         if (fipeCache == null || !dto.MesReferencia().equalsIgnoreCase(fipeCache.getReferenciaMes())) {
+
+            // ADICIONE ESTA VERIFICAÇÃO:
+            // Se não encontrou pela Marca/Modelo, busca usando a restrição da V9
+            if (fipeCache == null) {
+                fipeCache = fipeRepository.findByCodigoFipeAndCodigoAno(dto.CodigoFipe(), yearId).orElse(null);
+            }
+
             Fipe fipeAtualizado = fipeMapper.toEntity(dto, brandId, modelId, yearId, fipeCache);
             fipeRepository.save(fipeAtualizado);
         }

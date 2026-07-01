@@ -15,7 +15,7 @@ import java.util.function.Function;
 @Component
 public class AvaliacoesMapper {
 
-    public Avaliacoes toEntity(AvaliacaoRequestDTO dto, Long usuarioId, double precoFipe, String codigoFipe, StatusResultado status, String msgIA, double variacao) {
+    public Avaliacoes toEntity(AvaliacaoRequestDTO dto, Long usuarioId, double precoFipe, Fipe fipe, StatusResultado status, String msgIA, double variacao) {
         Avaliacoes entity = new Avaliacoes();
 
         entity.setUsuarioId(usuarioId);
@@ -25,7 +25,7 @@ public class AvaliacoesMapper {
         entity.setNotasPessoais(dto.getNotasPessoais());
 
         entity.setPrecoFipe(precoFipe);
-        entity.setFipeId(codigoFipe);
+        entity.setFipe(fipe);
         entity.setStatusResultado(status);
 
         entity.setHistoricoAtivo(HistoricoAtivo.SIM);
@@ -36,14 +36,18 @@ public class AvaliacoesMapper {
         return entity;
     }
 
-    public AvaliacaoResponseDTO toDTO(Avaliacoes entity, Fipe fipe) {
+    public AvaliacaoResponseDTO toDTO(Avaliacoes entity) {
+        if (entity == null) {
+            return null;
+        }
+        Fipe fipe = entity.getFipe();
         VeiculoDTO veiculo = fipe != null
                 ? new VeiculoDTO(fipe.getMarca(), fipe.getModelo(), fipe.getAno(), fipe.getCombustivel())
                 : null;
 
         return new AvaliacaoResponseDTO(
                 entity.getId(),
-                entity.getFipeId(),
+                fipe != null ? fipe.getCodigoFipe() : null,
                 veiculo,
                 entity.getPrecoDesejado(),
                 entity.getPrecoFipe(),
@@ -58,9 +62,9 @@ public class AvaliacoesMapper {
         );
     }
 
-    public List<AvaliacaoResponseDTO> toDTOList(List<Avaliacoes> entities, Function<String, Fipe> buscaFipePorCodigo) {
+    public List<AvaliacaoResponseDTO> toDTOList(List<Avaliacoes> entities) {
         return entities.stream()
-                .map(e -> toDTO(e, buscaFipePorCodigo.apply(e.getFipeId())))
+                .map(this::toDTO)
                 .toList();
     }
 }
