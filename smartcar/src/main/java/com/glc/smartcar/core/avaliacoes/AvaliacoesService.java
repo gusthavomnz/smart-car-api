@@ -4,6 +4,8 @@ import com.glc.smartcar.core.avaliacoes.dto.AvaliacaoRequestDTO;
 import com.glc.smartcar.core.avaliacoes.dto.AvaliacaoResponseDTO;
 import com.glc.smartcar.core.avaliacoes.enums.HistoricoAtivo;
 import com.glc.smartcar.core.avaliacoes.enums.StatusResultado;
+import com.glc.smartcar.integration.fipe.Fipe;
+import com.glc.smartcar.integration.fipe.FipeRepository;
 import com.glc.smartcar.integration.fipe.dto.FipeVeiculoDTO;
 import com.glc.smartcar.integration.fipe.port.FipePort;
 import com.glc.smartcar.integration.ia.port.IaPort;
@@ -14,21 +16,21 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
-
 public class AvaliacoesService {
 
     private final FipePort fipePort;
+    private final FipeRepository fipeRepository;
     private final AvaliacoesRepository avaliacoesRepository;
     private final AvaliacoesMapper avaliacoesMapper;
     private final ClassificacaoService classificacaoService;
     private final IaPort iaPort;
 
-    public AvaliacoesService(FipePort fipePort, AvaliacoesRepository avaliacoesRepository, AvaliacoesMapper avaliacoesMapper, ClassificacaoService classificacaoService, IaPort iaPort) {
+    public AvaliacoesService(FipePort fipePort, FipeRepository fipeRepository, AvaliacoesRepository avaliacoesRepository, AvaliacoesMapper avaliacoesMapper, ClassificacaoService classificacaoService, IaPort iaPort) {
         this.fipePort = fipePort;
+        this.fipeRepository = fipeRepository;
         this.avaliacoesRepository = avaliacoesRepository;
         this.avaliacoesMapper = avaliacoesMapper;
         this.classificacaoService = classificacaoService;
@@ -59,10 +61,14 @@ public class AvaliacoesService {
 
         String mensagemFinal = processarAnaliseIa(fipeVeiculoDTO.Modelo(), dto, precoJusto, precoFipe, status);
         double variacao = calcularVariacao(dto.getPrecoDesejado(), precoFipe);
-        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipeVeiculoDTO.CodigoFipe(), status, mensagemFinal, variacao);
+        Fipe fipe = fipeRepository.findByCodigoMarcaAndCodigoModeloAndCodigoAno(
+                dto.getBrandId(), dto.getModelId(), dto.getYearId()
+        ).orElseThrow(() -> new EntityNotFoundException("Fipe não encontrada no cache após consulta"));
+
+        Avaliacoes novaAvaliacao = avaliacoesMapper.toEntity(dto, usuarioId, precoFipe, fipe, status, mensagemFinal, variacao);
         Avaliacoes salvo = avaliacoesRepository.save(novaAvaliacao);
 
-        return avaliacoesMapper.toDTO(salvo, mensagemFinal);
+        return avaliacoesMapper.toDTO(salvo);
     }
 
     private double calcularVariacao(double precoDesejado, double precoFipe) {
@@ -78,7 +84,6 @@ public class AvaliacoesService {
 
         return iaPort.executarRequisicaoIA(iaPort.criarContexto(contexto));
     }
-
 
 
     @Transactional
@@ -100,6 +105,17 @@ public class AvaliacoesService {
                 .findAllByUsuarioIdAndHistoricoAtivo(usuarioId, HistoricoAtivo.SIM);
 
         return avaliacoesMapper.toDTOList(listaEntities);
+    }
+
+    public AvaliacaoResponseDTO buscarAvaliacaoPorId(Long id, Long usuarioId) {
+        Avaliacoes avaliacao = avaliacoesRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Avaliação não encontrada"));
+
+        if (!avaliacao.getUsuarioId().equals(usuarioId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para acessar esta avaliação");
+        }
+
+        return avaliacoesMapper.toDTO(avaliacao);
     }
 
 }

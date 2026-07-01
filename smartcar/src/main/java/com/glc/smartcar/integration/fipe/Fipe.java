@@ -6,10 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "fipe", uniqueConstraints = {
+    @UniqueConstraint(name = "uq_codigo_fipe_ano", columnNames = {"codigo_fipe", "codigo_ano"})
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Fipe {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +26,7 @@ public class Fipe {
         @Column(name = "ano", nullable = false)
         private int ano;
 
-        @Column(name = "codigo_fipe", unique = true)
+        @Column(name = "codigo_fipe")
         private String codigoFipe;
 
         @Column(name = "codigo_marca", nullable = false)

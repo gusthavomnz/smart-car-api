@@ -5,6 +5,7 @@ import com.glc.smartcar.core.avaliacoes.dto.AvaliacaoResponseDTO;
 import com.glc.smartcar.core.avaliacoes.enums.Conservacao;
 import com.glc.smartcar.core.avaliacoes.enums.HistoricoAtivo;
 import com.glc.smartcar.core.avaliacoes.enums.StatusResultado;
+import com.glc.smartcar.integration.fipe.Fipe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,11 +36,25 @@ class AvaliacoesMapperTest {
         return dto;
     }
 
+    private Fipe criarFipe() {
+        Fipe fipe = new Fipe();
+        fipe.setId(1L);
+        fipe.setMarca("Toyota");
+        fipe.setModelo("Corolla");
+        fipe.setAno(2020);
+        fipe.setCodigoFipe("001234-5");
+        fipe.setCombustivel("Gasolina");
+        fipe.setCodigoMarca("59");
+        fipe.setCodigoModelo("5940");
+        fipe.setCodigoAno("2020-1");
+        return fipe;
+    }
+
     private Avaliacoes criarEntidade() {
         Avaliacoes entidade = new Avaliacoes();
         entidade.setId(1L);
         entidade.setUsuarioId(1L);
-        entidade.setFipeId("001234-5");
+        entidade.setFipe(criarFipe());
         entidade.setPrecoDesejado(45000.0);
         entidade.setKmsRodados(50000.0);
         entidade.setPrecoFipe(48000.0);
@@ -48,6 +63,8 @@ class AvaliacoesMapperTest {
         entidade.setConservacao(Conservacao.BOM);
         entidade.setHistoricoAtivo(HistoricoAtivo.SIM);
         entidade.setNotasPessoais("Carro bem conservado");
+        entidade.setAvaliacaoIa("Luva de pedreiro compraria sim!");
+        entidade.setVariacao(-6.25);
         return entidade;
     }
 
@@ -56,23 +73,27 @@ class AvaliacoesMapperTest {
     @Test
     void deveConverterDtoParaEntidadeCorretamente() {
         AvaliacaoRequestDTO dto = criarDtoDeRequisicao();
+        Fipe fipe = criarFipe();
 
-        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, "001234-5", StatusResultado.OTIMO_NEGOCIO, "análise ia");
+        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, fipe, StatusResultado.OTIMO_NEGOCIO, "análise ia", -6.25);
 
         assertEquals(1L, entidade.getUsuarioId());
         assertEquals(50000.0, entidade.getKmsRodados());
         assertEquals(48000.0, entidade.getPrecoFipe());
-        assertEquals("001234-5", entidade.getFipeId());
+        assertEquals(fipe, entidade.getFipe());
         assertEquals(StatusResultado.OTIMO_NEGOCIO, entidade.getStatusResultado());
         assertEquals(Conservacao.BOM, entidade.getConservacao());
         assertEquals("Carro bem conservado", entidade.getNotasPessoais());
+        assertEquals("análise ia", entidade.getAvaliacaoIa());
+        assertEquals(-6.25, entidade.getVariacao());
     }
 
     @Test
     void toEntityDeveDefinirHistoricoAtivoComoSim() {
         AvaliacaoRequestDTO dto = criarDtoDeRequisicao();
+        Fipe fipe = criarFipe();
 
-        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, "001234-5", StatusResultado.NA_MEDIA, "análise ia");
+        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, fipe, StatusResultado.NA_MEDIA, "análise ia", 0.0);
 
         assertEquals(HistoricoAtivo.SIM, entidade.getHistoricoAtivo());
     }
@@ -80,23 +101,23 @@ class AvaliacoesMapperTest {
     @Test
     void toEntityDevePreencherDataDeCriacao() {
         AvaliacaoRequestDTO dto = criarDtoDeRequisicao();
+        Fipe fipe = criarFipe();
 
-        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, "001234-5", StatusResultado.NA_MEDIA, "análise ia");
+        Avaliacoes entidade = mapper.toEntity(dto, 1L, 48000.0, fipe, StatusResultado.NA_MEDIA, "análise ia", 0.0);
 
         assertNotNull(entidade.getCriado_a());
     }
 
-    // --- toDTO(entidade) ---
+    // --- toDTO ---
 
     @Test
-    void deveConverterEntidadeParaDtoSemAnaliseIA() {
+    void deveConverterEntidadeParaDtoCorretamente() {
         Avaliacoes entidade = criarEntidade();
 
         AvaliacaoResponseDTO dto = mapper.toDTO(entidade);
 
         assertNotNull(dto);
         assertEquals(1L, dto.getId());
-        assertEquals(1L, dto.getUsuarioId());
         assertEquals("001234-5", dto.getFipeId());
         assertEquals(45000.0, dto.getPrecoDesejado());
         assertEquals(48000.0, dto.getPrecoFipe());
@@ -104,33 +125,13 @@ class AvaliacoesMapperTest {
         assertEquals(Conservacao.BOM, dto.getConservacao());
         assertEquals(HistoricoAtivo.SIM, dto.getHistoricoAtivo());
         assertEquals("Carro bem conservado", dto.getNotasPessoais());
-        assertNull(dto.getAvaliacaoIA());
+        assertEquals("Luva de pedreiro compraria sim!", dto.getAvaliacaoIA());
+        assertEquals(-6.25, dto.getVariacao());
     }
 
     @Test
     void deveRetornarNullQuandoEntidadeForNull() {
-        AvaliacaoResponseDTO dto = mapper.toDTO((Avaliacoes) null);
-
-        assertNull(dto);
-    }
-
-    // --- toDTO(entidade, analiseIA) ---
-
-    @Test
-    void deveConverterEntidadeParaDtoComAnaliseIA() {
-        Avaliacoes entidade = criarEntidade();
-        String analise = "Luva de pedreiro compraria sim!";
-
-        AvaliacaoResponseDTO dto = mapper.toDTO(entidade, analise);
-
-        assertNotNull(dto);
-        assertEquals("Luva de pedreiro compraria sim!", dto.getAvaliacaoIA());
-        assertEquals(1L, dto.getId());
-    }
-
-    @Test
-    void deveRetornarNullQuandoEntidadeNullComAnaliseIA() {
-        AvaliacaoResponseDTO dto = mapper.toDTO((Avaliacoes) null, "alguma analise");
+        AvaliacaoResponseDTO dto = mapper.toDTO(null);
 
         assertNull(dto);
     }

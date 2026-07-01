@@ -9,11 +9,17 @@ import java.util.Optional;
 @Repository
 public interface FipeRepository extends JpaRepository<Fipe,Long> {
 
+    Optional<Fipe> findByCodigoFipeAndCodigoAno(
+            String codigoFipe,
+            String codigoAno
+    );
+
     Optional<Fipe> findByCodigoMarcaAndCodigoModeloAndCodigoAno(
             String codigoMarca,
             String codigoModelo,
             String codigoAno
     );
 
+    Optional<Fipe> findByCodigoFipe(String codigoFipe);
 
 }

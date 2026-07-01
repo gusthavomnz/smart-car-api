@@ -4,45 +4,29 @@ import com.glc.smartcar.core.avaliacoes.enums.Conservacao;
 import com.glc.smartcar.core.avaliacoes.enums.HistoricoAtivo;
 import com.glc.smartcar.core.avaliacoes.enums.StatusResultado;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AvaliacaoResponseDTO {
 
     private Long id;
-    private Long usuarioId;
     private String fipeId;
+    private VeiculoDTO veiculo;
     private Double precoDesejado;
     private Double precoFipe;
+    private Double variacao;
     private StatusResultado statusResultado;
-    private LocalDateTime criado_a;
     private Conservacao conservacao;
-    private HistoricoAtivo historicoAtivo;
+    private Double kmsRodados;
     private String notasPessoais;
     private String avaliacaoIA;
-    private Double variacao;
-
-    public AvaliacaoResponseDTO() {
-    }
-
-    public AvaliacaoResponseDTO(Long id, Long usuarioId, String fipeId, Double precoDesejado, Double precoFipe, StatusResultado statusResultado, LocalDateTime criado_a, Conservacao conservacao, HistoricoAtivo historicoAtivo, String notasPessoais) {
-        this.id = id;
-        this.usuarioId = usuarioId;
-        this.fipeId = fipeId;
-        this.precoDesejado = precoDesejado;
-        this.precoFipe = precoFipe;
-        this.statusResultado = statusResultado;
-        this.criado_a = criado_a;
-        this.conservacao = conservacao;
-        this.historicoAtivo = historicoAtivo;
-        this.notasPessoais = notasPessoais;
-    }
-
-    public AvaliacaoResponseDTO(Long id, Long usuarioId, String fipeId, Double precoDesejado, Double precoFipe, StatusResultado statusResultado, LocalDateTime criado_a, Conservacao conservacao, HistoricoAtivo historicoAtivo, String notasPessoais, String avaliacaoIA) {
-        this(id, usuarioId, fipeId, precoDesejado, precoFipe, statusResultado, criado_a, conservacao, historicoAtivo, notasPessoais);
-        this.avaliacaoIA = avaliacaoIA;
-    }
+    private LocalDateTime criado_a;
+    private HistoricoAtivo historicoAtivo;
 
 }
-

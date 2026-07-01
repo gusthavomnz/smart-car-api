@@ -3,6 +3,7 @@ package com.glc.smartcar.core.avaliacoes;
 import com.glc.smartcar.core.avaliacoes.enums.Conservacao;
 import com.glc.smartcar.core.avaliacoes.enums.HistoricoAtivo;
 import com.glc.smartcar.core.avaliacoes.enums.StatusResultado;
+import com.glc.smartcar.integration.fipe.Fipe;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,8 +23,9 @@ public class Avaliacoes {
     @Column(name = "usuario_id", nullable = false)
     private Long usuarioId;
 
-    @Column(name = "fipe_id", nullable = false)
-    private String fipeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fipe_id", nullable = false)
+    private Fipe fipe;
 
     @Column(name = "preco_desejado", nullable = false)
     private Double precoDesejado;

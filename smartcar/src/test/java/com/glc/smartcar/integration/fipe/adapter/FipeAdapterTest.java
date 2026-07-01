@@ -23,8 +23,8 @@ class FipeAdapterTest {
     FipeClient clienteFipe;
     @Mock
     FipeRepository repositorioFipe;
-    @Mock
-    FipeMapper mapeadorFipe;
+
+    FipeMapper mapeadorFipe = new FipeMapper();
 
     FipeAdapter adaptadorFipe;
 

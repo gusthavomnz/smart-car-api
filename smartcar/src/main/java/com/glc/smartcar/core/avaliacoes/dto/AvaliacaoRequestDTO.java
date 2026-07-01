@@ -23,7 +23,7 @@ public class AvaliacaoRequestDTO {
     @NotNull(message = "Informe o preço anunciado no veículo ")
     private double precoDesejado;
 
-    @NotBlank(message = "Informe suas notas pessoais sobre o anuncio. ")
+    @NotNull(message = "Informe suas notas pessoais sobre o anuncio. ")
     private String notasPessoais;
 
     @NotNull(message = "Informe a conservação do veículo")

@@ -8,4 +8,6 @@ import java.util.List;
 public interface AvaliacoesRepository extends JpaRepository<Avaliacoes,Long> {
 
     List<Avaliacoes> findAllByUsuarioIdAndHistoricoAtivo(Long usuarioId, HistoricoAtivo historicoAtivo);
+
+    void deleteAllByUsuarioId(Long usuarioId);
 }

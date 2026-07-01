@@ -37,4 +37,10 @@ public class AvaliacoesController {
         return ResponseEntity.ok(avaliacoesService.listarAvaliacoesPorUsuario(usuario.getId()));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<AvaliacaoResponseDTO> buscarAvaliacaoPorId(@PathVariable Long id,
+                                                                      @AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(avaliacoesService.buscarAvaliacaoPorId(id, usuario.getId()));
+    }
+
 }
